@@ -167,14 +167,18 @@ void drawScene(void)
 	{
 		if (k == 0) {//Player
 			Scena[k].Model = mat4(1.0); //Inizializzo con l'identità
-			Scena[k].Model = translate(Scena[k].Model, vec3(player.posX, player.posY, 0.0));
-			Scena[k].Model = scale(Scena[k].Model, vec3(50, 50, 1.0));
-			//Scena[k].Model = rotate(Scena[k].Model, radians(angolo), vec3(0.0, 0.0, 1.0));
-			printf("%f; %f\n", player.posX, player.posY);
 			player.boundingBox.Model = mat4(1.0);
-			player.boundingBox.Model = translate(Scena[k].Model, vec3(player.posX, player.posY, 0.0));
+
+			Scena[k].Model = translate(Scena[k].Model, vec3(player.posX, player.posY, 0.0));
+			player.boundingBox.Model = translate(player.boundingBox.Model, vec3(player.posX, player.posY, 0.0));
+			
 			player.boundingBox.Model = scale(Scena[k].Model, vec3(50, 50, 1.0));
-			printf("%d; %d\n", player.boundingBox.topLeftCorner, player.boundingBox.bottomRightCorner);
+			Scena[k].Model = scale(Scena[k].Model, vec3(50, 50, 1.0));
+
+			//Scena[k].Model = rotate(Scena[k].Model, radians(angolo), vec3(0.0, 0.0, 1.0));
+			printf("PLAYER POS : %f; %f\n", player.posX, player.posY);
+
+			printf("PLAYER BB : %f, %f --- %f, %f\n\n", player.boundingBox.topLeftCorner.x, player.boundingBox.topLeftCorner.y, player.boundingBox.bottomRightCorner.x, player.boundingBox.bottomRightCorner.y);
 			
 		}
 
@@ -195,7 +199,6 @@ void drawScene(void)
 
 		//Devo passare allo shader le info su dove andare a prendere le informazioni sulle variabili uniformi
 		glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(Scena[k].Model));
-
 		glBindVertexArray(Scena[k].VAO);
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glDrawArrays(GL_TRIANGLE_FAN, 0, Scena[k].nv);

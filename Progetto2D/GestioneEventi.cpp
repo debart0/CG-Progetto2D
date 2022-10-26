@@ -27,15 +27,23 @@ void myKeyboard(unsigned char key, int x, int y) {
 	{
 	case 'a':
 		player.posX -= player.speed;
+		player.boundingBox.topLeftCorner.x -= player.speed;
+		player.boundingBox.bottomRightCorner.x -= player.speed;
 		break;
 	case 'd':
 		player.posX += player.speed;
+		player.boundingBox.topLeftCorner.x += player.speed;
+		player.boundingBox.bottomRightCorner.x += player.speed;
 		break;
 	case 'w':
 		player.posY += player.speed;
+		player.boundingBox.topLeftCorner.y += player.speed;
+		player.boundingBox.bottomRightCorner.y += player.speed;
 		break;
 	case 's':
 		player.posY -= player.speed;
+		player.boundingBox.topLeftCorner.y -= player.speed;
+		player.boundingBox.bottomRightCorner.y -= player.speed;
 		break;
 	case 'p':
 		printf("Prova pausa");
@@ -44,6 +52,8 @@ void myKeyboard(unsigned char key, int x, int y) {
 		printf("Prova uscita");
 		exit(0);
 	}
+	//printf("Speed: %d\n", player.speed);
+	//printf("PLAYER BB : %f; %f\n", player.boundingBox.topLeftCorner, player.boundingBox.bottomRightCorner);
 
 	glutPostRedisplay();
 }
