@@ -3,3 +3,5 @@
 void myKeyboard(unsigned char key, int x, int y);
 
 bool checkCollision(BoundingBox boundingBox1, BoundingBox boundingBox2);
+
+bool checkCollision(vec4 tl1, vec4 br1, vec4 tl2, vec4 br2);

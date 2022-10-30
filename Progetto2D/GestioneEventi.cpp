@@ -1,22 +1,7 @@
 /*Implementazione di GestioneEventi.h*/
 
-/*void Player::buildColliders() {
-	vec2 min = vertices.at(0);
-	vec2 max = vertices.at(0); // minimun and maximum coordinates
-	for (vec3 vert : vertices){
-		if (min.x > vert.x) min.x = vert.x;
-		if (min.y > vert.y) min.y = vert.y;
-		if (max.x < vert.x) max.x = vert.x;
-		if (max.y < vert.y) max.y = vert.y;
-	}
-	topLeftCorner.x = min.x;
-	topLeftCorner.y = max.y;
-	bottomRightCorner.x = max.x;
-	bottomRightCorner.y = min.y;
-}
-
-*/
 #include "Definizioni.h"
+#include "GestioneEventi.h"
 
 extern Entity player;
 extern bool isPaused;
@@ -27,23 +12,23 @@ void myKeyboard(unsigned char key, int x, int y) {
 	{
 	case 'a':
 		player.posX -= player.speed;
-		player.boundingBox.topLeftCorner.x -= player.speed;
-		player.boundingBox.bottomRightCorner.x -= player.speed;
+		player.figura.tl_model.x -= player.speed;
+		player.figura.br_model.x -= player.speed;
 		break;
 	case 'd':
 		player.posX += player.speed;
-		player.boundingBox.topLeftCorner.x += player.speed;
-		player.boundingBox.bottomRightCorner.x += player.speed;
+		player.figura.tl_model.x += player.speed;
+		player.figura.br_model.x += player.speed;
 		break;
 	case 'w':
 		player.posY += player.speed;
-		player.boundingBox.topLeftCorner.y += player.speed;
-		player.boundingBox.bottomRightCorner.y += player.speed;
+		player.figura.tl_model.y += player.speed;
+		player.figura.br_model.y += player.speed;
 		break;
 	case 's':
 		player.posY -= player.speed;
-		player.boundingBox.topLeftCorner.y -= player.speed;
-		player.boundingBox.bottomRightCorner.y -= player.speed;
+		player.figura.tl_model.y -= player.speed;
+		player.figura.br_model.y -= player.speed;
 		break;
 	case 'p':
 		printf("Prova pausa");
@@ -57,7 +42,7 @@ void myKeyboard(unsigned char key, int x, int y) {
 
 	glutPostRedisplay();
 }
-
+//TODO fix
 bool checkCollision(BoundingBox boundingBox1, BoundingBox boundingBox2) {
 	
 	bool collisionX = boundingBox1.bottomRightCorner.x >= boundingBox2.topLeftCorner.x &&
@@ -69,5 +54,19 @@ bool checkCollision(BoundingBox boundingBox1, BoundingBox boundingBox2) {
 	if (collisionX && collisionY) 
 		return true; 
 	else 
+		return false;
+}
+
+bool checkCollision(vec4 tl1, vec4 br1, vec4 tl2, vec4 br2) {
+
+	bool collisionX = br1.x >=tl2.x &&
+		tl1.x <= br2.x;
+
+	bool collisionY = br1.y <= tl2.y &&
+		tl1.y >= br2.y;
+
+	if (collisionX && collisionY)
+		return true;
+	else
 		return false;
 }

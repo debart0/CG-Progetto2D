@@ -7,6 +7,7 @@
 #include "BoundingBox.h"
 #include "Definizioni.h"
 #include "GestioneEventi.h"
+#include "Utils.h"
 
 
 static unsigned int programId, MatModel, MatProj;
@@ -70,6 +71,11 @@ void costruisci_cuore(float cx, float cy, float raggiox, float raggioy, Figura* 
 	}
 	fig->nv = fig->vertici.size();
 
+	pair<vec4, vec4> boundingBoxPair = calcolaBoundingBox(fig);
+	fig->tl_original = boundingBoxPair.first;
+	fig->br_original = boundingBoxPair.second;
+	//printf("Bounding Box\nTOP LEFT: %f, %f\nBOT RIGHT: %f, %f\n", topLeftCorner.x, topLeftCorner.y, bottomRightCorner.x, bottomRightCorner.y);
+
 }
 
 void costruisci_cerchio(vec4 color_center, vec4 color_edges, Figura* fig) {
@@ -125,7 +131,7 @@ void INIT_SHADER(void)
 	GLenum ErrorCheckValue = glGetError();
 
 	char* vertexShader = (char*)"vertexShader_M.glsl";
-	char* fragmentShader = (char*)"fragmentShader_S.glsl";
+	char* fragmentShader = (char*)"fragmentShader_M.glsl";
 
 	programId = ShaderMaker::createProgram(vertexShader, fragmentShader);
 	glUseProgram(programId);
@@ -135,8 +141,8 @@ void INIT_VAO(void) {
 	Cuore.nTriangles = 30;
 	costruisci_cuore(0, 0, 1, 1, &Cuore);
 	player.figura = Cuore;
-	player.boundingBox = costruisciBoundingBox(&Cuore);
-	printf("PLAYER Bounding Box\nTOP LEFT: %f, %f\nBOT RIGHT: %f, %f\n", player.boundingBox.topLeftCorner.x, player.boundingBox.topLeftCorner.y, player.boundingBox.bottomRightCorner.x, player.boundingBox.bottomRightCorner.y);
+	/*printf("PLAYER Bounding Box\nTOP LEFT: %f, %f\nBOT RIGHT: %f, %f\n", player.boundingBox.topLeftCorner.x, player.boundingBox.topLeftCorner.y, player.boundingBox.bottomRightCorner.x, player.boundingBox.bottomRightCorner.y);*/
+	printf("\nPLAYER Bounding Box\t|\tTOP LEFT: %f, %f\tBOT RIGHT: %f, %f\n", player.figura.tl_original.x, player.figura.tl_original.y, player.figura.br_original.x, player.figura.br_original.y);
 
 	crea_VAO_Vector(&player.figura);
 	Scena.push_back(player.figura);
@@ -167,18 +173,25 @@ void drawScene(void)
 	{
 		if (k == 0) {//Player
 			Scena[k].Model = mat4(1.0); //Inizializzo con l'identità
-			player.boundingBox.Model = mat4(1.0);
-
-			Scena[k].Model = translate(Scena[k].Model, vec3(player.posX, player.posY, 0.0));
-			player.boundingBox.Model = translate(player.boundingBox.Model, vec3(player.posX, player.posY, 0.0));
-			
-			player.boundingBox.Model = scale(Scena[k].Model, vec3(50, 50, 1.0));
+			Scena[k].Model = translate(Scena[k].Model, vec3(player.posX, player.posY, 0.0));	
 			Scena[k].Model = scale(Scena[k].Model, vec3(50, 50, 1.0));
-
+			//vec4 bb1 = Scena[k].Model * vec4(player.boundingBox.bottomRightCorner.x, player.boundingBox.bottomRightCorner.y, player.boundingBox.bottomRightCorner.y, 1);
+			//vec4 bb2 = Scena[k].Model * vec4(player.boundingBox.topLeftCorner.x, player.boundingBox.topLeftCorner.y, player.boundingBox.topLeftCorner.y, 1);
+			//player.boundingBox.bottomRightCorner = vec3(bb1.x, bb1.y, bb1.z);
+			//player.boundingBox.topLeftCorner = vec3(bb2.x, bb2.y, bb2.z);
+			
+			
 			//Scena[k].Model = rotate(Scena[k].Model, radians(angolo), vec3(0.0, 0.0, 1.0));
-			printf("PLAYER POS : %f; %f\n", player.posX, player.posY);
+			//printf("PLAYER POS : %f; %f\n", player.posX, player.posY);
 
-			printf("PLAYER BB : %f, %f --- %f, %f\n\n", player.boundingBox.topLeftCorner.x, player.boundingBox.topLeftCorner.y, player.boundingBox.bottomRightCorner.x, player.boundingBox.bottomRightCorner.y);
+			vec4 br = player.figura.br_original; vec4 tl = player.figura.tl_original;
+			//tl = vec3(tl.x * 0.5 + player.posX, tl.y * 0.5 + player.posY, 1.0);
+			//br = vec3(br.x * 0.5 + player.posX, br.y * 0.5 + player.posY, 1.0);
+			br = Scena[k].Model * br; tl = Scena[k].Model * tl;
+
+			player.figura.br_model = br;
+			player.figura.tl_model = tl;
+			printf("PLAYER BB : %f, %f --- %f, %f\n\n", player.figura.tl_model.x, player.figura.tl_model.y, player.figura.br_model.x, player.figura.br_model.y);
 			
 		}
 
