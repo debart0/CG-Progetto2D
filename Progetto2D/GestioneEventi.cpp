@@ -27,9 +27,11 @@ void keyboardPressedEvent(unsigned char key, int x, int y) {
 	case 'p':
 		printf("Prova pausa");
 		isPaused = !isPaused;
+		break;
 	case ESC:
 		printf("Prova uscita");
 		exit(0);
+		break;
 	}
 	//printf("Speed: %d\n", player.speed);
 	//printf("PLAYER BB : %f; %f\n", player.boundingBox.topLeftCorner, player.boundingBox.bottomRightCorner);
@@ -66,55 +68,56 @@ bool checkCollision(vec4 tl1, vec4 br1, vec4 tl2, vec4 br2) {
 }
 
 void update(int a) {
-	bool moving = false;
-	float width = player.figura.br_model.x - player.figura.tl_model.x;
-	float height = player.figura.tl_model.y - player.figura.br_model.y;
-	//printf("posizione player: %f\n",player.posX);
-	player.posY -= gravity;
-
-	if (pressing_left)
-	{
-		//dx -= accelerazione;
-		player.posX -= drift_orizzontale;
-		moving = true;
-	}
-
-	if (pressing_right)
-	{
-		//dx += accelerazione;
-		player.posX += drift_orizzontale;
-		moving = true;
-	}
-
-	if (!moving) {   //Se non mi sto muovendo con i tasti a e d decremento od incremento la velocita' iniziale fino a portarla
-				 // a zero e la palla continua a rimbalzare sul posto
-		/*
-		if (dx > 0)
-		{
-			dx -= 1;
-			if (dx < 0)
-				dx = 0;
+	
+	if (!isPaused) {
+		bool moving = false;
+		float width = player.figura.br_model.x - player.figura.tl_model.x;
+		float height = player.figura.tl_model.y - player.figura.br_model.y;
+		//printf("posizione player: %f\n",player.posX);
+		player.posY -= gravity;
+		if (pressing_left){
+			//dx -= accelerazione;
+			player.posX -= drift_orizzontale;
+			moving = true;
 		}
 
-		if (dx < 0)
-		{
-			dx += 1;
+		if (pressing_right){
+			//dx += accelerazione;
+			player.posX += drift_orizzontale;
+			moving = true;
+		}
+
+		if (!moving) {   //Se non mi sto muovendo con i tasti a e d decremento od incremento la velocita' iniziale fino a portarla
+					 // a zero e la palla continua a rimbalzare sul posto
+			/*
 			if (dx > 0)
-				dx = 0;
-		}*/
+			{
+				dx -= 1;
+				if (dx < 0)
+					dx = 0;
+			}
 
-	}
+			if (dx < 0)
+			{
+				dx += 1;
+				if (dx > 0)
+					dx = 0;
+			}*/
 
-	if (player.posX <= width / 2) {
-		player.posX = width / 2	;
+		}
+
+		if (player.posX <= width / 2) {
+			player.posX = width / 2	;
+		}
+		if (player.posX > WINDOW_WIDTH - width / 2) {
+			player.posX = WINDOW_WIDTH - width / 2;
+		}
+		if (player.posY < 0 - height /2) {
+			player.posY = player_y;
+			player.posX = player_x;
+		
 	}
-	if (player.posX > WINDOW_WIDTH - width / 2) {
-		player.posX = WINDOW_WIDTH - width / 2;
-	}
-	if (player.posY < 0 - height /2) {
-		player.posY = player_y;
-		player.posX = player_x;
-		//TODO FARE QUALCOSA PER AUMENTARE LO SCORE
+	//TODO FARE QUALCOSA PER AUMENTARE LO SCORE
 	}
 	glutPostRedisplay();
 	glutTimerFunc(24, update, 0);
