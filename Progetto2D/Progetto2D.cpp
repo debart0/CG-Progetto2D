@@ -13,8 +13,13 @@
 static unsigned int programId, MatModel, MatProj;
 mat4 Projection;
 float angolo = 0.0, s = 1, dx = 0, dy = 0, player_dx = 0, player_dy = 0;
-int player_x = width / 2, player_y = height / 4;
+int player_x = WINDOW_WIDTH / 2, player_y = WINDOW_HEIGHT - 50;
+int drift_orizzontale = 1, gravity = 2;
 bool isPaused = false;
+//Booleani posti a true se si usa il tasto a (spostamento a sinistra) e b (spostamento a destra)
+bool pressing_left = false;
+bool pressing_right = false;
+
 Bounds boundingBox;
 
 vector<Figura> Scena;
@@ -102,30 +107,6 @@ void costruisci_cerchio(vec4 color_center, vec4 color_edges, Figura* fig) {
 
 }
 
-//TODO: fare che ritorni un qualcosa di tipo boundingbox
-//andrebbe anche passata attraverso le varie matrici di trasformazioni
-BoundingBox costruisciBoundingBox(Figura* fig) {
-	vec3 min = fig->vertici.at(0);
-	vec3 max = fig->vertici.at(0);
-	vec3 topLeftCorner, bottomRightCorner;
-	for (vec3 vertice : fig->vertici) {
-		if (min.x > vertice.x) min.x = vertice.x;
-		if (min.y > vertice.y) min.y = vertice.y;
-		if (max.x < vertice.x) max.x = vertice.x;
-		if (max.y < vertice.y) max.y = vertice.y;
-
-	}
-	topLeftCorner.x = min.x;
-	topLeftCorner.y = max.y;
-	bottomRightCorner.x = max.x;
-	bottomRightCorner.y = min.y;
-	BoundingBox bb = {};
-	bb.bottomRightCorner = bottomRightCorner;
-	bb.topLeftCorner = topLeftCorner;
-	printf("Bounding Box\nTOP LEFT: %f, %f\nBOT RIGHT: %f, %f\n", topLeftCorner.x, topLeftCorner.y, bottomRightCorner.x, bottomRightCorner.y);
-	return bb;
-}
-
 void INIT_SHADER(void)
 {
 	GLenum ErrorCheckValue = glGetError();
@@ -157,7 +138,7 @@ void INIT_VAO(void) {
 	crea_VAO_Vector(&Auto2);
 	Scena.push_back(Auto2);
 
-	Projection = ortho(0.0f, float(width), 0.0f, float(height));
+	Projection = ortho(0.0f, float(WINDOW_WIDTH), 0.0f, float(WINDOW_HEIGHT));
 	MatProj = glGetUniformLocation(programId, "Projection");
 	MatModel = glGetUniformLocation(programId, "Model");
 }
@@ -197,14 +178,14 @@ void drawScene(void)
 
 		if (k == 1) {
 			Scena[k].Model = mat4(1.0); //Inizializzo con l'identità
-			Scena[k].Model = translate(Scena[k].Model, vec3(200 + dx, height/6 + dy, 0.0));
+			Scena[k].Model = translate(Scena[k].Model, vec3(200 + dx, WINDOW_HEIGHT/6 + dy, 0.0));
 			Scena[k].Model = scale(Scena[k].Model, vec3(50, 50, 1.0));
 			Scena[k].Model = rotate(Scena[k].Model, radians(angolo), vec3(0.0, 0.0, 1.0));
 		}
 
 		if (k == 2) {
 			Scena[k].Model = mat4(1.0); //Inizializzo con l'identità
-			Scena[k].Model = translate(Scena[k].Model, vec3(600 + dx, height / 2 + dy, 0.0));
+			Scena[k].Model = translate(Scena[k].Model, vec3(600 + dx, WINDOW_HEIGHT / 2 + dy, 0.0));
 			Scena[k].Model = scale(Scena[k].Model, vec3(50 * s, 50 * s, 1.0));
 			Scena[k].Model = rotate(Scena[k].Model, radians(angolo), vec3(0.0, 0.0, 1.0));
 		}
@@ -236,11 +217,11 @@ void updateCar(int a)
 {
 	/*if (!paused && !ded) {
 		if (asteroidMoving) {
-			vec2 angleVec = vec2(width / 2, height / 2) - asteroid;
+			vec2 angleVec = vec2(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2) - asteroid;
 			angleVec = normalize(angleVec);
 			asteroid = vec2((asteroid.x + angleVec.x * asteroidSpeed), (asteroid.y + angleVec.y * asteroidSpeed));
-			if (((asteroid.x > width / 2 - width / 10 && asteroid.x < width / 2) || (asteroid.x < width / 2 + width / 10 && asteroid.x > width / 2)) &&
-				((asteroid.y > height / 2 - height / 10 && asteroid.y < height / 2) || (asteroid.y < height / 2 + height / 10 && asteroid.y > height / 2))) {
+			if (((asteroid.x > WINDOW_WIDTH / 2 - WINDOW_WIDTH / 10 && asteroid.x < WINDOW_WIDTH / 2) || (asteroid.x < WINDOW_WIDTH / 2 + WINDOW_WIDTH / 10 && asteroid.x > WINDOW_WIDTH / 2)) &&
+				((asteroid.y > WINDOW_HEIGHT / 2 - WINDOW_HEIGHT / 10 && asteroid.y < WINDOW_HEIGHT / 2) || (asteroid.y < WINDOW_HEIGHT / 2 + WINDOW_HEIGHT / 10 && asteroid.y > WINDOW_HEIGHT / 2))) {
 				ded = true;
 			}
 		}
@@ -287,15 +268,16 @@ int main(int argc, char* argv[])
 
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 
-	glutInitWindowSize(width, height);
+	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	glutInitWindowPosition(0, 0);
 	glutCreateWindow("Progetto 2D");
 	glutDisplayFunc(drawScene);
-	glutKeyboardFunc(myKeyboard);
+	glutKeyboardFunc(keyboardPressedEvent);
+	glutKeyboardUpFunc(keyboardReleasedEvent);
 
 	player.posX = player_x; player.posY = player_y; player.speed = PLAYER_SPEED;
 
-	glutTimerFunc(50, updateAngolo, 0);
+	glutTimerFunc(66, update, 0);
 	glewExperimental = GL_TRUE;
 	glewInit();
 	INIT_SHADER();

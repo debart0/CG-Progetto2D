@@ -4,8 +4,8 @@
 
 #define ESC 27
 #define PI 3.14159265358979323846
-#define width 800
-#define height 800
+#define WINDOW_WIDTH 600
+#define WINDOW_HEIGHT 800
 #define PLAYER_SPEED 6
 
 typedef struct {
@@ -26,6 +26,9 @@ typedef struct {
 	vec4 tl_model;	//model è dopo ogni trasformazione
 	vec4 br_original;
 	vec4 br_model;
+	//Larghezza e altezza della figura (e quindi della bounding box)
+	float width;
+	float height;
 } Figura;
 
 typedef struct {

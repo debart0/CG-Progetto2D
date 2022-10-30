@@ -1,7 +1,9 @@
 #pragma once
 /*Varie funzioni per la gestione di eventi del gioco, come la risposta all'input da tastiera o il controllo delle collisioni*/
-void myKeyboard(unsigned char key, int x, int y);
+void keyboardPressedEvent(unsigned char key, int x, int y);
 
-bool checkCollision(BoundingBox boundingBox1, BoundingBox boundingBox2);
+void keyboardReleasedEvent(unsigned char key, int x, int y);
 
 bool checkCollision(vec4 tl1, vec4 br1, vec4 tl2, vec4 br2);
+
+void update(int a);

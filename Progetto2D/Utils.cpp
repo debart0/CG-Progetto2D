@@ -20,3 +20,7 @@ pair<vec4, vec4> calcolaBoundingBox(Figura* fig) {
 	pair<vec4, vec4> pair = make_pair(vec4(topLeftCorner, 1.0), vec4(bottomRightCorner, 1.0));
 	return pair;
 }
+/*
+pair<float, float> calcolaDimensioniFigura(Figura* fig) {
+	pair<float,float> pair = make_pair(fig->tl_original)
+}*/
