@@ -29,7 +29,7 @@ vector<Figura> Scena;
 
 Figura  Farf = {};
 Figura Cuore = {};
-Figura Auto1 = {}, Auto2 = {};
+Figura Asteroide = {}, Auto1 = {}, Auto2 = {};
 Entity player = {};
 
 void crea_VAO_Vector(Figura* fig)
@@ -97,7 +97,8 @@ void InterpolazioneHermite(float* t, Figura* Fig, vec4 color_top, vec4 color_bot
 				//appartiene
 
 	Fig->vertici.push_back(vec3(-1.0, 5.0, 0.0));
-	Fig->colors.push_back(vec4(1.0, 1.0, 0.0, 1.0));
+	//Fig->colors.push_back(vec4(1.0, 1.0, 0.0, 1.0));
+	Fig->colors.push_back(color_bot);
 
 
 
@@ -113,6 +114,7 @@ void InterpolazioneHermite(float* t, Figura* Fig, vec4 color_top, vec4 color_bot
 		y = Fig->CP[is].y * PHI0(tgmapp) + dy(is, t, p_t, p_b, p_c, Fig) * PHI1(tgmapp) * ampiezza + Fig->CP[is + 1].y * PSI0(tgmapp) + dy(is + 1, t, p_t, p_b, p_c, Fig) * PSI1(tgmapp) * ampiezza;
 		Fig->vertici.push_back(vec3(x, y, 0.0));
 		Fig->colors.push_back(color_top);
+
 	}
 
 
@@ -171,6 +173,43 @@ void costruisci_cerchio(vec4 color_center, vec4 color_edges, Figura* fig) {
 
 }
 
+void costruisci_asteroide(vec4 color_top, vec4 color_bot, Figura* forma) {
+	float* t;
+
+	//forma->CP.push_back(vec3(0.0, 0.0, 0.0));
+	forma->CP.push_back(vec3(-10, 0, 0.0));
+	forma->CP.push_back(vec3(-7, 6, 0.0));
+	forma->CP.push_back(vec3(-4,10, 0.0));
+
+	forma->CP.push_back(vec3(0, 7, 0.0));
+	forma->CP.push_back(vec3(2, 6, 0.0));
+	forma->CP.push_back(vec3(5,7, 0.0));
+	forma->CP.push_back(vec3(10,2, 0.0));
+	forma->CP.push_back(vec3(8, -1, 0.0));
+	forma->CP.push_back(vec3(6, -3, 0.0));
+	forma->CP.push_back(vec3(7, -7, 0.0));
+
+	forma->CP.push_back(vec3(3,-10, 0.0));
+	forma->CP.push_back(vec3(-6, -5, 0.0));
+
+	forma->CP.push_back(vec3(-10, 0, 0.0));
+
+
+
+	t = new float[forma->CP.size()];
+	int i;
+	float step = 1.0 / (float)(forma->CP.size() - 1);
+
+	for (i = 0; i < forma->CP.size(); i++)
+		t[i] = i * step;
+
+
+	InterpolazioneHermite(t, &Asteroide, color_top, color_bot);
+	forma->vertici.push_back(vec3(0.0, 0.0, 0.0));
+	forma->colors.push_back(vec4(1.0, 0.0, 0.0, 1.0));
+	forma->nv = forma->vertici.size();
+}
+
 void INIT_SHADER(void)
 {
 	GLenum ErrorCheckValue = glGetError();
@@ -201,6 +240,13 @@ void INIT_VAO(void) {
 	costruisci_cuore(0, 0, 1, 1, &Auto2);
 	crea_VAO_Vector(&Auto2);
 	Scena.push_back(Auto2);
+
+	//vec4 col_bottom = vec4{ 0.5451, 0.2706, 0.0745, 1.0000 };
+	vec4 col_bottom = vec4{ 1.0, 0,0,1.0 };
+	vec4 col_top = vec4{ 1.0,0.4980, 0.0353,1.0000 };
+	costruisci_asteroide(col_top, col_bottom, &Asteroide);
+	crea_VAO_Vector(&Asteroide);
+	Scena.push_back(Asteroide);
 
 	Projection = ortho(0.0f, float(WINDOW_WIDTH), 0.0f, float(WINDOW_HEIGHT));
 	MatProj = glGetUniformLocation(programId, "Projection");
@@ -254,6 +300,13 @@ void drawScene(void)
 			Scena[k].Model = rotate(Scena[k].Model, radians(angolo), vec3(0.0, 0.0, 1.0));
 		}
 
+
+		if (k == 3) {
+			Scena[k].Model = mat4(1.0); //Inizializzo con l'identità
+			Scena[k].Model = translate(Scena[k].Model, vec3(300 + delta_x, WINDOW_HEIGHT / 2 + delta_y, 0.0));
+			Scena[k].Model = scale(Scena[k].Model, vec3(10 * s, 10 * s, 1.0));
+			Scena[k].Model = rotate(Scena[k].Model, radians(angolo), vec3(0.0, 0.0, 1.0));
+		}
 
 		//Devo passare allo shader le info su dove andare a prendere le informazioni sulle variabili uniformi
 		glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(Scena[k].Model));
