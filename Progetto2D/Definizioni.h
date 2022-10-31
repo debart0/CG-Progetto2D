@@ -7,6 +7,7 @@
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 800
 #define PLAYER_SPEED 6
+#define MAX_VITE 3
 
 typedef struct {
 	GLuint VAO;
@@ -16,7 +17,9 @@ typedef struct {
 	int radius;//TODO rimuovere questo campo se sicuro
 	// Vertici
 	vector<vec3> vertici;
+	vector<vec3> CP;
 	vector<vec4> colors;
+	vector<int> indici;
 	// Numero vertici
 	int nv;
 	//Matrice di Modellazione: Traslazione*Rotazione*Scala

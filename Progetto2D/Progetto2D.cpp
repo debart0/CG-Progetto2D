@@ -12,13 +12,16 @@
 
 static unsigned int programId, MatModel, MatProj;
 mat4 Projection;
-float angolo = 0.0, s = 1, dx = 0, dy = 0, player_dx = 0, player_dy = 0;
+float angolo = 0.0, s = 1, delta_x = 0, delta_y = 0, player_dx = 0, player_dy = 0;
 int player_x = WINDOW_WIDTH / 2, player_y = WINDOW_HEIGHT - 50;
 int drift_orizzontale = 1, gravity = 2;
+int vite = MAX_VITE; int score = 0;
+int pval = 140;
 bool isPaused = false;
 //Booleani posti a true se si usa il tasto a (spostamento a sinistra) e b (spostamento a destra)
 bool pressing_left = false;
 bool pressing_right = false;
+vec2 mouse;
 
 Bounds boundingBox;
 
@@ -52,7 +55,68 @@ void crea_VAO_Vector(Figura* fig)
 
 }
 
+/// /////////////////////////////////// Disegna geometria //////////////////////////////////////
+//Per Curve di hermite
+#define PHI0(t)  (2.0*t*t*t-3.0*t*t+1)
+#define PHI1(t)  (t*t*t-2.0*t*t+t)
+#define PSI0(t)  (-2.0*t*t*t+3.0*t*t)
+#define PSI1(t)  (t*t*t-t*t)
+float dx(int i, float* t, float Tens, float Bias, float Cont, Figura* Fig)
+{
+	if (i == 0)
+		return  0.5 * (1 - Tens) * (1 - Bias) * (1 - Cont) * (Fig->CP[i + 1].x - Fig->CP[i].x) / (t[i + 1] - t[i]);
+	if (i == Fig->CP.size() - 1)
+		return  0.5 * (1 - Tens) * (1 - Bias) * (1 - Cont) * (Fig->CP[i].x - Fig->CP[i - 1].x) / (t[i] - t[i - 1]);
 
+	if (i % 2 == 0)
+		return  0.5 * (1 - Tens) * (1 + Bias) * (1 + Cont) * (Fig->CP.at(i).x - Fig->CP.at(i - 1).x) / (t[i] - t[i - 1]) + 0.5 * (1 - Tens) * (1 - Bias) * (1 - Cont) * (Fig->CP.at(i + 1).x - Fig->CP.at(i).x) / (t[i + 1] - t[i]);
+	else
+		return  0.5 * (1 - Tens) * (1 + Bias) * (1 - Cont) * (Fig->CP.at(i).x - Fig->CP.at(i - 1).x) / (t[i] - t[i - 1]) + 0.5 * (1 - Tens) * (1 - Bias) * (1 + Cont) * (Fig->CP.at(i + 1).x - Fig->CP.at(i).x) / (t[i + 1] - t[i]);
+}
+float dy(int i, float* t, float Tens, float Bias, float Cont, Figura* Fig)
+{
+	if (i == 0)
+		return 0.5 * (1 - Tens) * (1 - Bias) * (1 - Cont) * (Fig->CP.at(i + 1).y - Fig->CP.at(i).y) / (t[i + 1] - t[i]);
+	if (i == Fig->CP.size() - 1)
+		return  0.5 * (1 - Tens) * (1 - Bias) * (1 - Cont) * (Fig->CP.at(i).y - Fig->CP.at(i - 1).y) / (t[i] - t[i - 1]);
+
+	if (i % 2 == 0)
+		return  0.5 * (1 - Tens) * (1 + Bias) * (1 + Cont) * (Fig->CP.at(i).y - Fig->CP.at(i - 1).y) / (t[i] - t[i - 1]) + 0.5 * (1 - Tens) * (1 - Bias) * (1 - Cont) * (Fig->CP.at(i + 1).y - Fig->CP.at(i).y) / (t[i + 1] - t[i]);
+	else
+		return  0.5 * (1 - Tens) * (1 + Bias) * (1 - Cont) * (Fig->CP.at(i).y - Fig->CP.at(i - 1).y) / (t[i] - t[i - 1]) + 0.5 * (1 - Tens) * (1 - Bias) * (1 + Cont) * (Fig->CP.at(i + 1).y - Fig->CP.at(i).y) / (t[i + 1] - t[i]);
+}
+
+void InterpolazioneHermite(float* t, Figura* Fig, vec4 color_top, vec4 color_bot)
+{
+	float p_t = 0, p_b = 0, p_c = 0, x, y;
+	float passotg = 1.0 / (float)(pval - 1);
+	float passotg0 = 1.0 / 10.0;
+	float tg = 0, tgmapp, ampiezza;
+	int i = 0;
+	int is = 0; //indice dell'estremo sinistro dell'intervallo [t(i),t(i+1)] a cui il punto tg
+				//appartiene
+
+	Fig->vertici.push_back(vec3(-1.0, 5.0, 0.0));
+	Fig->colors.push_back(vec4(1.0, 1.0, 0.0, 1.0));
+
+
+
+
+	for (tg = 0; tg <= 1; tg += passotg)
+	{
+		if (tg > t[is + 1]) is++;
+
+		ampiezza = (t[is + 1] - t[is]);
+		tgmapp = (tg - t[is]) / ampiezza;
+
+		x = Fig->CP[is].x * PHI0(tgmapp) + dx(is, t, p_t, p_b, p_c, Fig) * PHI1(tgmapp) * ampiezza + Fig->CP[is + 1].x * PSI0(tgmapp) + dx(is + 1, t, p_t, p_b, p_c, Fig) * PSI1(tgmapp) * ampiezza;
+		y = Fig->CP[is].y * PHI0(tgmapp) + dy(is, t, p_t, p_b, p_c, Fig) * PHI1(tgmapp) * ampiezza + Fig->CP[is + 1].y * PSI0(tgmapp) + dy(is + 1, t, p_t, p_b, p_c, Fig) * PSI1(tgmapp) * ampiezza;
+		Fig->vertici.push_back(vec3(x, y, 0.0));
+		Fig->colors.push_back(color_top);
+	}
+
+
+}
 
 void costruisci_cuore(float cx, float cy, float raggiox, float raggioy, Figura* fig) {
 
@@ -178,14 +242,14 @@ void drawScene(void)
 
 		if (k == 1) {
 			Scena[k].Model = mat4(1.0); //Inizializzo con l'identità
-			Scena[k].Model = translate(Scena[k].Model, vec3(200 + dx, WINDOW_HEIGHT/6 + dy, 0.0));
+			Scena[k].Model = translate(Scena[k].Model, vec3(200 + delta_x, WINDOW_HEIGHT/6 + delta_y, 0.0));
 			Scena[k].Model = scale(Scena[k].Model, vec3(50, 50, 1.0));
 			Scena[k].Model = rotate(Scena[k].Model, radians(angolo), vec3(0.0, 0.0, 1.0));
 		}
 
 		if (k == 2) {
 			Scena[k].Model = mat4(1.0); //Inizializzo con l'identità
-			Scena[k].Model = translate(Scena[k].Model, vec3(600 + dx, WINDOW_HEIGHT / 2 + dy, 0.0));
+			Scena[k].Model = translate(Scena[k].Model, vec3(600 + delta_x, WINDOW_HEIGHT / 2 + delta_y, 0.0));
 			Scena[k].Model = scale(Scena[k].Model, vec3(50 * s, 50 * s, 1.0));
 			Scena[k].Model = rotate(Scena[k].Model, radians(angolo), vec3(0.0, 0.0, 1.0));
 		}
@@ -258,6 +322,31 @@ void updateCar(int a)
 	//glutTimerFunc(24, update_asteroid, 0);*/
 }
 
+void main_menu_func(int option)
+{
+	switch (option)
+	{
+	case 1: glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		break;
+	case 2: glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		break;
+
+	default:
+		break;
+	}
+}
+
+void buildOpenGLMenu()
+{
+
+	glutCreateMenu(main_menu_func); // richiama main_menu_func() alla selezione di una voce menu
+	glutAddMenuEntry("Opzioni", -1); //-1 significa che non si vuole gestire questa riga
+
+	glutAddMenuEntry("Wireframe", 1);
+	glutAddMenuEntry("Face fill", 2);
+
+	glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
 
 int main(int argc, char* argv[])
 {
@@ -274,6 +363,7 @@ int main(int argc, char* argv[])
 	glutDisplayFunc(drawScene);
 	glutKeyboardFunc(keyboardPressedEvent);
 	glutKeyboardUpFunc(keyboardReleasedEvent);
+	glutPassiveMotionFunc(mouseClick);
 
 	player.posX = player_x; player.posY = player_y; player.speed = PLAYER_SPEED;
 
@@ -282,6 +372,7 @@ int main(int argc, char* argv[])
 	glewInit();
 	INIT_SHADER();
 	INIT_VAO();
+	buildOpenGLMenu();
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

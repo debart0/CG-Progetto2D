@@ -6,7 +6,8 @@
 extern Entity player;
 extern bool isPaused;
 extern bool pressing_left, pressing_right, moving;
-extern int player_x, player_y, drift_orizzontale, gravity;
+extern int player_x, player_y, drift_orizzontale, gravity, score;
+extern vec2 mouse;
 //devo aggiungere questi movimenti alla matrice di traslazione (chiamiamo gli spostamenti dx e dy)
 void keyboardPressedEvent(unsigned char key, int x, int y) {
 	//x e y che passo alla funzione sono le coordinate del mouse nella finestra quindi non mi servono
@@ -50,6 +51,15 @@ void keyboardReleasedEvent(unsigned char key, int x, int y) {
 	default:
 		break;
 	}
+
+}
+
+
+void mouseClick(int x, int y)
+{
+
+	mouse.x = (float)x;
+	mouse.y = (float)y;
 
 }
 
@@ -115,6 +125,8 @@ void update(int a) {
 		if (player.posY < 0 - height /2) {
 			player.posY = player_y;
 			player.posX = player_x;
+			score += 1;
+			printf("Score: %d\n", score);
 		
 	}
 	//TODO FARE QUALCOSA PER AUMENTARE LO SCORE
