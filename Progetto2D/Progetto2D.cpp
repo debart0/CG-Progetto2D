@@ -4,7 +4,6 @@
 #include <iostream>
 #include "ShaderMaker.h"
 #include "Lib.h"
-#include "BoundingBox.h"
 #include "Definizioni.h"
 #include "GestioneEventi.h"
 #include "Utils.h"
@@ -22,8 +21,6 @@ bool isPaused = false;
 bool pressing_left = false;
 bool pressing_right = false;
 vec2 mouse;
-
-Bounds boundingBox;
 
 vector<Figura> Scena;
 
@@ -178,19 +175,24 @@ void costruisci_asteroide(vec4 color_top, vec4 color_bot, Figura* forma) {
 
 	//forma->CP.push_back(vec3(0.0, 0.0, 0.0));
 	forma->CP.push_back(vec3(-10, 0, 0.0));
+	forma->CP.push_back(vec3(-9.5, 3, 0.0));
 	forma->CP.push_back(vec3(-7, 6, 0.0));
+	forma->CP.push_back(vec3(-6, 9, 0.0));
 	forma->CP.push_back(vec3(-4,10, 0.0));
-
+	forma->CP.push_back(vec3(-2, 9, 0.0));
 	forma->CP.push_back(vec3(0, 7, 0.0));
-	forma->CP.push_back(vec3(2, 6, 0.0));
-	forma->CP.push_back(vec3(5,7, 0.0));
+	forma->CP.push_back(vec3(2, 6, 0.0));	
+
+	forma->CP.push_back(vec3(5,7, 0.0));	//Questo punto sembra problematico
+	forma->CP.push_back(vec3(9, 4, 0.0));
 	forma->CP.push_back(vec3(10,2, 0.0));
 	forma->CP.push_back(vec3(8, -1, 0.0));
-	forma->CP.push_back(vec3(6, -3, 0.0));
+	forma->CP.push_back(vec3(6.5, -2.5, 0.0));
 	forma->CP.push_back(vec3(7, -7, 0.0));
-
 	forma->CP.push_back(vec3(3,-10, 0.0));
+	forma->CP.push_back(vec3(-3, -6, 0.0));
 	forma->CP.push_back(vec3(-6, -5, 0.0));
+	forma->CP.push_back(vec3(-9, -3, 0.0));
 
 	forma->CP.push_back(vec3(-10, 0, 0.0));
 
@@ -205,7 +207,9 @@ void costruisci_asteroide(vec4 color_top, vec4 color_bot, Figura* forma) {
 
 
 	InterpolazioneHermite(t, &Asteroide, color_top, color_bot);
-	forma->vertici.push_back(vec3(0.0, 0.0, 0.0));
+	forma->vertici.push_back(vec3(-10.0, 0.0, 0.0));
+	//forma->vertici.push_back(vec3(0, 0, 0.0));
+	forma->vertici.at(0) = vec3(0.0, 0.0, 0.0);	//QUA CAMBIO IL CENTRO DELLA MESH DI HERMITE PER IL MIO SCOPO
 	forma->colors.push_back(vec4(1.0, 0.0, 0.0, 1.0));
 	forma->nv = forma->vertici.size();
 }
@@ -247,7 +251,6 @@ void INIT_VAO(void) {
 	costruisci_asteroide(col_top, col_bottom, &Asteroide);
 	crea_VAO_Vector(&Asteroide);
 	Scena.push_back(Asteroide);
-
 	Projection = ortho(0.0f, float(WINDOW_WIDTH), 0.0f, float(WINDOW_HEIGHT));
 	MatProj = glGetUniformLocation(programId, "Projection");
 	MatModel = glGetUniformLocation(programId, "Model");
@@ -261,7 +264,7 @@ void drawScene(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 	glUniformMatrix4fv(MatProj, 1, GL_FALSE, value_ptr(Projection)); //Questa può andare fuori dal ciclo xk nn cambia
 	for (k = 0; k < Scena.size(); k++)
-	{
+	{/*
 		if (k == 0) {//Player
 			Scena[k].Model = mat4(1.0); //Inizializzo con l'identità
 			Scena[k].Model = translate(Scena[k].Model, vec3(player.posX, player.posY, 0.0));	
@@ -298,13 +301,13 @@ void drawScene(void)
 			Scena[k].Model = translate(Scena[k].Model, vec3(600 + delta_x, WINDOW_HEIGHT / 2 + delta_y, 0.0));
 			Scena[k].Model = scale(Scena[k].Model, vec3(50 * s, 50 * s, 1.0));
 			Scena[k].Model = rotate(Scena[k].Model, radians(angolo), vec3(0.0, 0.0, 1.0));
-		}
+		}*/
 
 
 		if (k == 3) {
 			Scena[k].Model = mat4(1.0); //Inizializzo con l'identità
 			Scena[k].Model = translate(Scena[k].Model, vec3(300 + delta_x, WINDOW_HEIGHT / 2 + delta_y, 0.0));
-			Scena[k].Model = scale(Scena[k].Model, vec3(10 * s, 10 * s, 1.0));
+			Scena[k].Model = scale(Scena[k].Model, vec3(20 * s, 20 * s, 1.0));
 			Scena[k].Model = rotate(Scena[k].Model, radians(angolo), vec3(0.0, 0.0, 1.0));
 		}
 

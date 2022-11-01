@@ -18,9 +18,6 @@
     <ClCompile Include="ShaderMaker.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="BoundingBox.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="Progetto2D.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -39,9 +36,6 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="ShaderMaker.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
-    <ClInclude Include="BoundingBox.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="GestioneEventi.h">
