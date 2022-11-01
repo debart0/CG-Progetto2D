@@ -38,6 +38,8 @@ typedef struct {
 	Figura figura;
 	float posX;
 	float posY;
+	int dx;
+	int dy;
 	int speed;
 } Entity;
 

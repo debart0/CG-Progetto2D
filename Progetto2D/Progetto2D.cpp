@@ -8,6 +8,7 @@
 #include "GestioneEventi.h"
 #include "Utils.h"
 
+////////////////////////////////////// Dichiarazione variabili //////////////////////////////////////
 
 static unsigned int programId, MatModel, MatProj;
 mat4 Projection;
@@ -20,13 +21,14 @@ bool isPaused = false;
 //Booleani posti a true se si usa il tasto a (spostamento a sinistra) e b (spostamento a destra)
 bool pressing_left = false;
 bool pressing_right = false;
+vec4 asteroide_col_bot = { 0.181, 0.181, 0.185, 1.0 }; vec4 asteroide_col_top = { 0.076, 0.076, 0.084, 1.0 };
 vec2 mouse;
 
 vector<Figura> Scena;
 
-Figura  Farf = {};
+Figura Farf = {};
 Figura Cuore = {};
-Figura Asteroide = {}, Auto1 = {}, Auto2 = {};
+Figura Asteroide = {}; Figura Asteroide1 = {}; Figura Asteroide2 = {};
 Entity player = {};
 
 void crea_VAO_Vector(Figura* fig)
@@ -206,7 +208,7 @@ void costruisci_asteroide(vec4 color_top, vec4 color_bot, Figura* forma) {
 		t[i] = i * step;
 
 
-	InterpolazioneHermite(t, &Asteroide, color_top, color_bot);
+	InterpolazioneHermite(t, forma, color_top, color_bot);
 	forma->vertici.push_back(vec3(-10.0, 0.0, 0.0));
 	//forma->vertici.push_back(vec3(0, 0, 0.0));
 	forma->vertici.at(0) = vec3(0.0, 0.0, 0.0);	//QUA CAMBIO IL CENTRO DELLA MESH DI HERMITE PER IL MIO SCOPO
@@ -235,20 +237,19 @@ void INIT_VAO(void) {
 	crea_VAO_Vector(&player.figura);
 	Scena.push_back(player.figura);
 
-	Auto1.nTriangles = 30;
-	costruisci_cuore(0, 0, 1, 1, &Auto1);
-	crea_VAO_Vector(&Auto1);
-	Scena.push_back(Auto1);
+	//Asteroide1.nTriangles = 30;
+	costruisci_asteroide(asteroide_col_top, asteroide_col_bot, &Asteroide1);
+	crea_VAO_Vector(&Asteroide1);
+	Scena.push_back(Asteroide1);
 
-	Auto2.nTriangles = 30;
-	costruisci_cuore(0, 0, 1, 1, &Auto2);
-	crea_VAO_Vector(&Auto2);
-	Scena.push_back(Auto2);
+	//Asteroide2.nTriangles = 30;
+	costruisci_asteroide(asteroide_col_top, asteroide_col_bot, &Asteroide2);
+	crea_VAO_Vector(&Asteroide2);
+	Scena.push_back(Asteroide2);
 
 	//vec4 col_bottom = vec4{ 0.5451, 0.2706, 0.0745, 1.0000 };
-	vec4 col_bottom = vec4{ 1.0, 0,0,1.0 };
-	vec4 col_top = vec4{ 1.0,0.4980, 0.0353,1.0000 };
-	costruisci_asteroide(col_top, col_bottom, &Asteroide);
+
+	costruisci_asteroide(asteroide_col_top, asteroide_col_bot, &Asteroide);
 	crea_VAO_Vector(&Asteroide);
 	Scena.push_back(Asteroide);
 	Projection = ortho(0.0f, float(WINDOW_WIDTH), 0.0f, float(WINDOW_HEIGHT));
@@ -264,7 +265,7 @@ void drawScene(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 	glUniformMatrix4fv(MatProj, 1, GL_FALSE, value_ptr(Projection)); //Questa può andare fuori dal ciclo xk nn cambia
 	for (k = 0; k < Scena.size(); k++)
-	{/*
+	{
 		if (k == 0) {//Player
 			Scena[k].Model = mat4(1.0); //Inizializzo con l'identità
 			Scena[k].Model = translate(Scena[k].Model, vec3(player.posX, player.posY, 0.0));	
@@ -301,10 +302,10 @@ void drawScene(void)
 			Scena[k].Model = translate(Scena[k].Model, vec3(600 + delta_x, WINDOW_HEIGHT / 2 + delta_y, 0.0));
 			Scena[k].Model = scale(Scena[k].Model, vec3(50 * s, 50 * s, 1.0));
 			Scena[k].Model = rotate(Scena[k].Model, radians(angolo), vec3(0.0, 0.0, 1.0));
-		}*/
+		}
 
 
-		if (k == 3) {
+		if (k == 1) {
 			Scena[k].Model = mat4(1.0); //Inizializzo con l'identità
 			Scena[k].Model = translate(Scena[k].Model, vec3(300 + delta_x, WINDOW_HEIGHT / 2 + delta_y, 0.0));
 			Scena[k].Model = scale(Scena[k].Model, vec3(20 * s, 20 * s, 1.0));
