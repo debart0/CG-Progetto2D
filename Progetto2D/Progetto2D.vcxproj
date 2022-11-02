@@ -139,7 +139,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="GameWindow.cpp" />
     <ClCompile Include="GestioneEventi.cpp" />
     <ClCompile Include="Progetto2D.cpp" />
     <ClCompile Include="ShaderMaker.cpp" />
