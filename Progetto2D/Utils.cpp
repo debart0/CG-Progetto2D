@@ -1,6 +1,10 @@
 /*Implementazione di Utils.h*/
 
 #include "Utils.h"
+#include "Definizioni.h"
+
+extern Figura Asteroide1, Asteroide2, Asteroide3;
+extern Entity player, nemico1, nemico2, nemico3;
 
 pair<vec4, vec4> calcolaBoundingBox(Figura* fig) {
 	vec3 min = fig->vertici.at(0);
@@ -24,3 +28,12 @@ pair<vec4, vec4> calcolaBoundingBox(Figura* fig) {
 pair<float, float> calcolaDimensioniFigura(Figura* fig) {
 	pair<float,float> pair = make_pair(fig->tl_original)
 }*/
+
+void inizializzaEntity() {
+
+}
+
+void resettaPosizione(Entity entity) {
+	entity.posX = entity.defaultPosition.x;
+	entity.posY = entity.defaultPosition.x;
+}

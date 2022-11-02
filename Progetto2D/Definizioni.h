@@ -7,6 +7,9 @@
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 800
 #define PLAYER_SPEED 6
+#define ENEMY_SPEED_1 2
+#define ENEMY_SPEED_2 5
+#define ENEMY_SPEED_3 3
 #define MAX_VITE 3
 
 typedef struct {
@@ -36,6 +39,7 @@ typedef struct {
 
 typedef struct {
 	Figura figura;
+	vec2 defaultPosition;
 	float posX;
 	float posY;
 	int dx;

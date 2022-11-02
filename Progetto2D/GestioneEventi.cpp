@@ -1,12 +1,13 @@
 /*Implementazione di GestioneEventi.h*/
 
 #include "Definizioni.h"
+#include "Utils.h"
 #include "GestioneEventi.h"
 
-extern Entity player;
-extern bool isPaused;
+extern Entity player, nemico1, nemico2, nemico3;
+extern bool isPaused, gameOver;
 extern bool pressing_left, pressing_right, moving;
-extern int player_x, player_y, drift_orizzontale, gravity, score;
+extern int player_x, player_y, drift_orizzontale, gravity, score, vite;
 extern vec2 mouse;
 //devo aggiungere questi movimenti alla matrice di traslazione (chiamiamo gli spostamenti dx e dy)
 void keyboardPressedEvent(unsigned char key, int x, int y) {
@@ -71,15 +72,37 @@ bool checkCollision(vec4 tl1, vec4 br1, vec4 tl2, vec4 br2) {
 	bool collisionY = br1.y <= tl2.y &&
 		tl1.y >= br2.y;
 
-	if (collisionX && collisionY)
-		return true;
-	else
-		return false;
+	return collisionX && collisionY;
+}
+
+bool checkCollision(Figura fig1, Figura fig2) {
+	bool collisionX = fig1.br_model.x >= fig2.tl_model.x &&
+		fig1.tl_model.x <= fig2.br_model.x;
+
+	bool collisionY = fig1.br_model.y <= fig2.tl_model.y &&
+		fig1.tl_model.y >= fig2.br_model.y;
+	//Si ha collisione se c'è collisione sia nella direzione x che nella direzione y
+
+	return collisionX && collisionY;
 }
 
 void update(int a) {
 	
 	if (!isPaused) {
+		if (checkCollision(player.figura, nemico1.figura) || checkCollision(player.figura, nemico2.figura) || checkCollision(player.figura, nemico3.figura)) {
+			printf("COLLISIONE\n");
+			//resetta posizione
+			//togli una vita
+			//controlla che le vite non siano finite
+			resettaPosizione(player);
+			resettaPosizione(nemico1);
+			resettaPosizione(nemico2);
+			resettaPosizione(nemico3);
+			vite -= 1;
+			if (vite <= 0) {
+				gameOver = true;
+			}
+		}
 		bool moving = false;
 		float width = player.figura.br_model.x - player.figura.tl_model.x;
 		float height = player.figura.tl_model.y - player.figura.br_model.y;
