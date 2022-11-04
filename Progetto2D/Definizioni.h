@@ -6,8 +6,8 @@
 #define PI 3.14159265358979323846
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 800
-#define PLAYER_SPEED 6
-#define ENEMY_SPEED_1 2
+#define PLAYER_SPEED 7
+#define ENEMY_SPEED_1 4
 #define ENEMY_SPEED_2 5
 #define ENEMY_SPEED_3 3
 #define MAX_VITE 3
@@ -42,8 +42,8 @@ typedef struct {
 	vec2 defaultPosition;
 	float posX;
 	float posY;
-	int dx;
-	int dy;
-	int speed;
+	float dx;
+	float dy;
+	float speed;
 } Entity;
 

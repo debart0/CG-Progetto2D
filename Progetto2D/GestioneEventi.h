@@ -11,3 +11,5 @@ bool checkCollision(Figura fig1, Figura fig2);
 void mouseClick(int x, int y);
 
 void update(int a);
+
+void updateAsteroidi(int a);

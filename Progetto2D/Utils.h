@@ -8,5 +8,5 @@ pair<vec4, vec4> calcolaBoundingBox(Figura* fig);
 //Inizializza una entity associandole una figura e variabili per velocità e posizione
 void inizializzaEntity();
 
-//Resetta la posizione di un entità a quella di default
-void resettaPosizione(Entity entity);
+//Resetta la posizione di player a quella di default
+void resettaPosizionePlayer();

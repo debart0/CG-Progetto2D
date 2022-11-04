@@ -14,10 +14,15 @@ static unsigned int programId, MatModel, MatProj;
 mat4 Projection;
 float angolo = 0.0, s = 1, delta_x = 0, delta_y = 0, player_dx = 0, player_dy = 0;
 int player_x = WINDOW_WIDTH / 2, player_y = WINDOW_HEIGHT - 50;
+vec2 player_default_pos = { WINDOW_WIDTH / 2, WINDOW_HEIGHT - 50 };
+vec2 nemico1_default_pos = { 100.0, WINDOW_HEIGHT / 1.5 };
+vec2 nemico2_default_pos = { 600.0 , WINDOW_HEIGHT/ 3};
+vec2 nemico3_default_pos = {};
+
 int drift_orizzontale = 1, gravity = 2;
 int vite = MAX_VITE; int score = 0;
 int pval = 140;
-bool isPaused = false, gameOver = false;
+bool isPaused = false, gameOver = false, drawBB = false;
 //Booleani posti a true se si usa il tasto a (spostamento a sinistra) e b (spostamento a destra)
 bool pressing_left = false;
 bool pressing_right = false;
@@ -145,7 +150,6 @@ void costruisci_cuore(float cx, float cy, float raggiox, float raggioy, Figura* 
 	fig->tl_original = boundingBoxPair.first;
 	fig->br_original = boundingBoxPair.second;
 	//printf("Bounding Box\nTOP LEFT: %f, %f\nBOT RIGHT: %f, %f\n", topLeftCorner.x, topLeftCorner.y, bottomRightCorner.x, bottomRightCorner.y);
-
 }
 
 void costruisci_cerchio(vec4 color_center, vec4 color_edges, Figura* fig) {
@@ -198,8 +202,6 @@ void costruisci_asteroide(vec4 color_top, vec4 color_bot, Figura* forma) {
 
 	forma->CP.push_back(vec3(-10, 0, 0.0));
 
-
-
 	t = new float[forma->CP.size()];
 	int i;
 	float step = 1.0 / (float)(forma->CP.size() - 1);
@@ -218,6 +220,7 @@ void costruisci_asteroide(vec4 color_top, vec4 color_bot, Figura* forma) {
 	pair<vec4, vec4> boundingBoxPair = calcolaBoundingBox(forma);
 	forma->tl_original = boundingBoxPair.first;
 	forma->br_original = boundingBoxPair.second;
+
 }
 
 void INIT_SHADER(void)
@@ -291,7 +294,7 @@ void drawScene(void)
 
 			if (k == 1) {
 				Scena[k].Model = mat4(1.0); //Inizializzo con l'identità
-				Scena[k].Model = translate(Scena[k].Model, vec3(200 + delta_x, WINDOW_HEIGHT/6 + delta_y, 0.0));
+				Scena[k].Model = translate(Scena[k].Model, vec3(nemico1.posX, nemico1.posY, 0.0));
 				Scena[k].Model = scale(Scena[k].Model, vec3(7, 7, 1.0));
 				Scena[k].Model = rotate(Scena[k].Model, radians(angolo), vec3(0.0, 0.0, 1.0));
 
@@ -300,13 +303,14 @@ void drawScene(void)
 
 				nemico1.figura.br_model = br;
 				nemico1.figura.tl_model = tl;
+				//printf("dx del nemico 1: %f\n", nemico1.dx);
 				//printf("ENEMY BB : %f, %f --- %f, %f\n\n", nemico1.figura.tl_model.x, nemico1.figura.tl_model.y, nemico1.figura.br_model.x, nemico1.figura.br_model.y);
 			}
 
 			if (k == 2) {
 				Scena[k].Model = mat4(1.0); //Inizializzo con l'identità
-				Scena[k].Model = translate(Scena[k].Model, vec3(600 + delta_x, WINDOW_HEIGHT / 2 + delta_y, 0.0));
-				Scena[k].Model = scale(Scena[k].Model, vec3(7 * s, 7 * s, 1.0));
+				Scena[k].Model = translate(Scena[k].Model, vec3(nemico2.posX, nemico2.posY, 0.0));
+				Scena[k].Model = scale(Scena[k].Model, vec3(7, 7, 1.0));
 				Scena[k].Model = rotate(Scena[k].Model, radians(angolo), vec3(0.0, 0.0, 1.0));
 
 				vec4 br = nemico2.figura.br_original; vec4 tl = nemico2.figura.tl_original;
@@ -314,6 +318,8 @@ void drawScene(void)
 
 				nemico2.figura.br_model = br;
 				nemico2.figura.tl_model = tl;
+				//printf("posx del nemico 2: %f\n", nemico2.posX);
+
 			}
 
 
@@ -328,7 +334,14 @@ void drawScene(void)
 			glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(Scena[k].Model));
 			glBindVertexArray(Scena[k].VAO);
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			glDrawArrays(GL_TRIANGLE_FAN, 0, Scena[k].nv);
+			glDrawArrays(GL_TRIANGLE_FAN, 0, Scena[k].nv-6);
+
+			//Disegno Bounding Box
+			if (drawBB == TRUE)
+			{				
+				glDrawArrays(GL_LINE_STRIP, Scena[k].nv - 6, 6);
+				glBindVertexArray(0);
+			}
 		}
 	}
 	else {
@@ -439,13 +452,10 @@ int main(int argc, char* argv[])
 	glutKeyboardUpFunc(keyboardReleasedEvent);
 	glutPassiveMotionFunc(mouseClick);
 
-	player.posX = player_x; player.posY = player_y; player.speed = PLAYER_SPEED;
-	nemico1.speed = ENEMY_SPEED_1;
-	nemico2.speed = ENEMY_SPEED_2;
-	nemico3.speed = ENEMY_SPEED_3;
 	//TODO 
 	inizializzaEntity();
-	glutTimerFunc(66, update, 0);
+	glutTimerFunc(25, update, 0);
+	glutTimerFunc(25, updateAsteroidi, 0);
 	glewExperimental = GL_TRUE;
 	glewInit();
 	INIT_SHADER();
