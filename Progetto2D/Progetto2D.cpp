@@ -13,11 +13,11 @@
 static unsigned int programId, MatModel, MatProj;
 mat4 Projection;
 float angolo = 0.0, s = 1, delta_x = 0, delta_y = 0, player_dx = 0, player_dy = 0;
-int player_x = WINDOW_WIDTH / 2, player_y = WINDOW_HEIGHT - 50;
-vec2 player_default_pos = { WINDOW_WIDTH / 2, WINDOW_HEIGHT - 50 };
+float enemy_rotation_1 = 1.5, enemy_rotation_2 = -1.2, enemy_rotation_3 = 0.7;
+vec2 player_default_pos = { WINDOW_WIDTH / 2, WINDOW_HEIGHT };
 vec2 nemico1_default_pos = { 100.0, WINDOW_HEIGHT / 1.5 };
 vec2 nemico2_default_pos = { 600.0 , WINDOW_HEIGHT/ 3};
-vec2 nemico3_default_pos = {};
+vec2 nemico3_default_pos = {27.0,  WINDOW_HEIGHT / 4.5};
 
 int drift_orizzontale = 1, gravity = 2;
 int vite = MAX_VITE; int score = 0;
@@ -295,11 +295,12 @@ void drawScene(void)
 			if (k == 1) {
 				Scena[k].Model = mat4(1.0); //Inizializzo con l'identità
 				Scena[k].Model = translate(Scena[k].Model, vec3(nemico1.posX, nemico1.posY, 0.0));
-				Scena[k].Model = scale(Scena[k].Model, vec3(7, 7, 1.0));
-				Scena[k].Model = rotate(Scena[k].Model, radians(angolo), vec3(0.0, 0.0, 1.0));
+				Scena[k].Model = scale(Scena[k].Model, vec3(5, 5, 1.0));
 
 				vec4 br = nemico1.figura.br_original; vec4 tl = nemico1.figura.tl_original;
 				br = Scena[k].Model * br; tl = Scena[k].Model * tl;
+
+				Scena[k].Model = rotate(Scena[k].Model, radians(angolo * enemy_rotation_1), vec3(0.0, 0.0, 1.0));
 
 				nemico1.figura.br_model = br;
 				nemico1.figura.tl_model = tl;
@@ -311,10 +312,11 @@ void drawScene(void)
 				Scena[k].Model = mat4(1.0); //Inizializzo con l'identità
 				Scena[k].Model = translate(Scena[k].Model, vec3(nemico2.posX, nemico2.posY, 0.0));
 				Scena[k].Model = scale(Scena[k].Model, vec3(7, 7, 1.0));
-				Scena[k].Model = rotate(Scena[k].Model, radians(angolo), vec3(0.0, 0.0, 1.0));
 
 				vec4 br = nemico2.figura.br_original; vec4 tl = nemico2.figura.tl_original;
 				br = Scena[k].Model * br; tl = Scena[k].Model * tl;
+
+				Scena[k].Model = rotate(Scena[k].Model, radians(angolo*enemy_rotation_2), vec3(0.0, 0.0, 1.0));
 
 				nemico2.figura.br_model = br;
 				nemico2.figura.tl_model = tl;
@@ -322,13 +324,22 @@ void drawScene(void)
 
 			}
 
-
-			/*if (k == 1) {
+			
+			if (k == 3) {
 				Scena[k].Model = mat4(1.0); //Inizializzo con l'identità
-				Scena[k].Model = translate(Scena[k].Model, vec3(300 + delta_x, WINDOW_HEIGHT / 2 + delta_y, 0.0));
-				Scena[k].Model = scale(Scena[k].Model, vec3(20 * s, 20 * s, 1.0));
-				Scena[k].Model = rotate(Scena[k].Model, radians(angolo), vec3(0.0, 0.0, 1.0));
-			}*/
+				Scena[k].Model = translate(Scena[k].Model, vec3(nemico3.posX, nemico3.posY, 0.0));
+				Scena[k].Model = scale(Scena[k].Model, vec3(4, 6, 1.0));
+
+				vec4 br = nemico3.figura.br_original; vec4 tl = nemico3.figura.tl_original;
+				br = Scena[k].Model * br; tl = Scena[k].Model * tl;
+
+				Scena[k].Model = rotate(Scena[k].Model, radians(angolo*enemy_rotation_3), vec3(0.0, 0.0, 1.0));
+
+				nemico3.figura.br_model = br;
+				nemico3.figura.tl_model = tl;
+				//printf("posx del nemico 2: %f\n", nemico2.posX);
+
+			}
 
 			//Devo passare allo shader le info su dove andare a prendere le informazioni sulle variabili uniformi
 			glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(Scena[k].Model));
@@ -336,11 +347,24 @@ void drawScene(void)
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glDrawArrays(GL_TRIANGLE_FAN, 0, Scena[k].nv-6);
 
+			
+
 			//Disegno Bounding Box
 			if (drawBB == TRUE)
 			{				
 				glDrawArrays(GL_LINE_STRIP, Scena[k].nv - 6, 6);
 				glBindVertexArray(0);
+			}
+		}
+		if (checkCollision(player.figura, nemico1.figura) || checkCollision(player.figura, nemico2.figura)) {
+			printf("COLLISIONE\n");
+			//resetta posizione
+			//togli una vita
+			//controlla che le vite non siano finite
+			resettaPosizionePlayer();
+			vite -= 1;
+			if (vite <= 0) {
+				gameOver = true;
 			}
 		}
 	}
@@ -355,11 +379,7 @@ void drawScene(void)
 
 void updateAngolo(int value) {
 	angolo += 1;
-	s = s * 1.1;
-	if (s > 2) {
-		s = 1;
-	}
-	glutTimerFunc(50, updateAngolo, 0);
+	glutTimerFunc(80, updateAngolo, 0);
 
 	glutPostRedisplay();
 }
@@ -455,6 +475,7 @@ int main(int argc, char* argv[])
 	//TODO 
 	inizializzaEntity();
 	glutTimerFunc(25, update, 0);
+	glutTimerFunc(25, updateAngolo, 0);
 	glutTimerFunc(25, updateAsteroidi, 0);
 	glewExperimental = GL_TRUE;
 	glewInit();

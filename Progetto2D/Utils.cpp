@@ -58,7 +58,6 @@ void inizializzaEntity() {
 	nemico2.dx = (float) nemico2.speed;
 	nemico3.speed = ENEMY_SPEED_3;
 	nemico3.dx = (float) nemico3.speed;
-	printf("posx del nemico 2: %f\n", nemico2.posX);
 
 
 }
@@ -66,4 +65,5 @@ void inizializzaEntity() {
 void resettaPosizionePlayer() {
 	player.posX = player_default_pos.x;
 	player.posY = player_default_pos.y;
+	printf("Posizione resettata\n");
 }

@@ -7,7 +7,7 @@
 extern Entity player, nemico1, nemico2, nemico3;
 extern bool isPaused, gameOver, drawBB;
 extern bool pressing_left, pressing_right, moving;
-extern int player_x, player_y, drift_orizzontale, gravity, score, vite;
+extern int drift_orizzontale, gravity, score, vite;
 extern vec2 mouse;
 //devo aggiungere questi movimenti alla matrice di traslazione (chiamiamo gli spostamenti dx e dy)
 void keyboardPressedEvent(unsigned char key, int x, int y) {
@@ -95,23 +95,7 @@ bool checkCollision(Figura fig1, Figura fig2) {
 void update(int a) {
 	
 	if (!isPaused) {//TODO RIMETTERE COLLISIONE CON NEMICO3
-		if (checkCollision(player.figura, nemico1.figura) || checkCollision(player.figura, nemico2.figura)) {
-			if (checkCollision(player.figura, nemico1.figura)) { 
-				printf("Collisione con nemico1\n"); 
-			}
-			if (checkCollision(player.figura, nemico2.figura)) { printf("Collisione con nemico2\n"); }
-			printf("COLLISIONE\n");
-			//resetta posizione
-			//togli una vita
-			//controlla che le vite non siano finite
-			resettaPosizionePlayer();
-
-			//printf("Resettato la posizione del player: %f, %f\n", player.posX, player.posY);
-			vite -= 1;
-			if (vite <= 0) {
-				gameOver = true;
-			}
-		}
+		
 		bool moving = false;
 		float width = player.figura.br_model.x - player.figura.tl_model.x;
 		float height = player.figura.tl_model.y - player.figura.br_model.y;
@@ -155,8 +139,7 @@ void update(int a) {
 			player.posX = WINDOW_WIDTH - width / 2;
 		}
 		if (player.posY < 0 - height /2) {
-			player.posY = player_y;
-			player.posX = player_x;
+			resettaPosizionePlayer();
 			score += 1;
 			printf("Score: %d\n", score);
 		

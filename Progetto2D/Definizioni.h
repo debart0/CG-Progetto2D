@@ -39,7 +39,6 @@ typedef struct {
 
 typedef struct {
 	Figura figura;
-	vec2 defaultPosition;
 	float posX;
 	float posY;
 	float dx;
