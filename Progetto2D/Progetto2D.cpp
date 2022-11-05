@@ -13,7 +13,7 @@
 static unsigned int programId, MatModel, MatProj;
 mat4 Projection;
 float angolo = 0.0, s = 1, delta_x = 0, delta_y = 0, player_dx = 0, player_dy = 0;
-float enemy_rotation_1 = 1.5, enemy_rotation_2 = -1.2, enemy_rotation_3 = 0.7;
+float enemy_rotation_1 = 0.5, enemy_rotation_2 = -0.4, enemy_rotation_3 = 0.7;
 vec2 player_default_pos = { WINDOW_WIDTH / 2, WINDOW_HEIGHT };
 vec2 nemico1_default_pos = { 100.0, WINDOW_HEIGHT / 1.5 };
 vec2 nemico2_default_pos = { 600.0 , WINDOW_HEIGHT/ 3};
@@ -26,12 +26,13 @@ bool isPaused = false, gameOver = false, drawBB = false;
 //Booleani posti a true se si usa il tasto a (spostamento a sinistra) e b (spostamento a destra)
 bool pressing_left = false;
 bool pressing_right = false;
-vec4 asteroide_col_bot = { 0.181, 0.181, 0.185, 1.0 }; vec4 asteroide_col_top = { 0.076, 0.076, 0.084, 1.0 };
+vec4 asteroide_col_bot = { 0.181, 0.181, 0.185, 1.0 }, asteroide_col_top = { 0.076, 0.076, 0.084, 1.0 };
+vec4 pod_col_primario = vec4(0.80, 0.82, 0.84, 1.0), pod_col_secondario = vec4(0.09, 0.10, 0.10, 1.0), pod_col_accenti = vec4(0.91, 0.58, 0.11, 1.0);
 vec2 mouse;
 
 vector<Figura> Scena;
 
-Figura Farf = {};
+Figura Pod = {};
 Figura Cuore = {};
 Figura Asteroide = {}, Asteroide1 = {}, Asteroide2 = {}, Asteroide3 = {};
 Entity player = {}, nemico1 = {}, nemico2 = {}, nemico3 = {};
@@ -56,71 +57,6 @@ void crea_VAO_Vector(Figura* fig)
 	//Adesso carico il VBO dei colori nel layer 2
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray(1);
-
-}
-
-/// /////////////////////////////////// Disegna geometria //////////////////////////////////////
-//Per Curve di hermite
-#define PHI0(t)  (2.0*t*t*t-3.0*t*t+1)
-#define PHI1(t)  (t*t*t-2.0*t*t+t)
-#define PSI0(t)  (-2.0*t*t*t+3.0*t*t)
-#define PSI1(t)  (t*t*t-t*t)
-float dx(int i, float* t, float Tens, float Bias, float Cont, Figura* Fig)
-{
-	if (i == 0)
-		return  0.5 * (1 - Tens) * (1 - Bias) * (1 - Cont) * (Fig->CP[i + 1].x - Fig->CP[i].x) / (t[i + 1] - t[i]);
-	if (i == Fig->CP.size() - 1)
-		return  0.5 * (1 - Tens) * (1 - Bias) * (1 - Cont) * (Fig->CP[i].x - Fig->CP[i - 1].x) / (t[i] - t[i - 1]);
-
-	if (i % 2 == 0)
-		return  0.5 * (1 - Tens) * (1 + Bias) * (1 + Cont) * (Fig->CP.at(i).x - Fig->CP.at(i - 1).x) / (t[i] - t[i - 1]) + 0.5 * (1 - Tens) * (1 - Bias) * (1 - Cont) * (Fig->CP.at(i + 1).x - Fig->CP.at(i).x) / (t[i + 1] - t[i]);
-	else
-		return  0.5 * (1 - Tens) * (1 + Bias) * (1 - Cont) * (Fig->CP.at(i).x - Fig->CP.at(i - 1).x) / (t[i] - t[i - 1]) + 0.5 * (1 - Tens) * (1 - Bias) * (1 + Cont) * (Fig->CP.at(i + 1).x - Fig->CP.at(i).x) / (t[i + 1] - t[i]);
-}
-float dy(int i, float* t, float Tens, float Bias, float Cont, Figura* Fig)
-{
-	if (i == 0)
-		return 0.5 * (1 - Tens) * (1 - Bias) * (1 - Cont) * (Fig->CP.at(i + 1).y - Fig->CP.at(i).y) / (t[i + 1] - t[i]);
-	if (i == Fig->CP.size() - 1)
-		return  0.5 * (1 - Tens) * (1 - Bias) * (1 - Cont) * (Fig->CP.at(i).y - Fig->CP.at(i - 1).y) / (t[i] - t[i - 1]);
-
-	if (i % 2 == 0)
-		return  0.5 * (1 - Tens) * (1 + Bias) * (1 + Cont) * (Fig->CP.at(i).y - Fig->CP.at(i - 1).y) / (t[i] - t[i - 1]) + 0.5 * (1 - Tens) * (1 - Bias) * (1 - Cont) * (Fig->CP.at(i + 1).y - Fig->CP.at(i).y) / (t[i + 1] - t[i]);
-	else
-		return  0.5 * (1 - Tens) * (1 + Bias) * (1 - Cont) * (Fig->CP.at(i).y - Fig->CP.at(i - 1).y) / (t[i] - t[i - 1]) + 0.5 * (1 - Tens) * (1 - Bias) * (1 + Cont) * (Fig->CP.at(i + 1).y - Fig->CP.at(i).y) / (t[i + 1] - t[i]);
-}
-
-void InterpolazioneHermite(float* t, Figura* Fig, vec4 color_top, vec4 color_bot)
-{
-	float p_t = 0, p_b = 0, p_c = 0, x, y;
-	float passotg = 1.0 / (float)(pval - 1);
-	float passotg0 = 1.0 / 10.0;
-	float tg = 0, tgmapp, ampiezza;
-	int i = 0;
-	int is = 0; //indice dell'estremo sinistro dell'intervallo [t(i),t(i+1)] a cui il punto tg
-				//appartiene
-
-	Fig->vertici.push_back(vec3(-1.0, 5.0, 0.0));
-	//Fig->colors.push_back(vec4(1.0, 1.0, 0.0, 1.0));
-	Fig->colors.push_back(color_bot);
-
-
-
-
-	for (tg = 0; tg <= 1; tg += passotg)
-	{
-		if (tg > t[is + 1]) is++;
-
-		ampiezza = (t[is + 1] - t[is]);
-		tgmapp = (tg - t[is]) / ampiezza;
-
-		x = Fig->CP[is].x * PHI0(tgmapp) + dx(is, t, p_t, p_b, p_c, Fig) * PHI1(tgmapp) * ampiezza + Fig->CP[is + 1].x * PSI0(tgmapp) + dx(is + 1, t, p_t, p_b, p_c, Fig) * PSI1(tgmapp) * ampiezza;
-		y = Fig->CP[is].y * PHI0(tgmapp) + dy(is, t, p_t, p_b, p_c, Fig) * PHI1(tgmapp) * ampiezza + Fig->CP[is + 1].y * PSI0(tgmapp) + dy(is + 1, t, p_t, p_b, p_c, Fig) * PSI1(tgmapp) * ampiezza;
-		Fig->vertici.push_back(vec3(x, y, 0.0));
-		Fig->colors.push_back(color_top);
-
-	}
-
 
 }
 
@@ -223,6 +159,8 @@ void costruisci_asteroide(vec4 color_top, vec4 color_bot, Figura* forma) {
 
 }
 
+
+
 void INIT_SHADER(void)
 {
 	GLenum ErrorCheckValue = glGetError();
@@ -235,9 +173,10 @@ void INIT_SHADER(void)
 }
 
 void INIT_VAO(void) {
-	Cuore.nTriangles = 30;
-	costruisci_cuore(0, 0, 1, 1, &Cuore);
-	player.figura = Cuore;
+	//Cuore.nTriangles = 30;
+	//costruisci_cuore(0, 0, 1, 1, &Cuore);
+	costruisci_pod(pod_col_primario, pod_col_secondario, pod_col_accenti, &Pod);
+	player.figura = Pod;
 	//printf("\nPLAYER Bounding Box\t|\tTOP LEFT: %f, %f\tBOT RIGHT: %f, %f\n", player.figura.tl_original.x, player.figura.tl_original.y, player.figura.br_original.x, player.figura.br_original.y);
 
 	crea_VAO_Vector(&player.figura);
@@ -278,8 +217,10 @@ void drawScene(void)
 		{
 			if (k == 0) {//Player
 				Scena[k].Model = mat4(1.0); //Inizializzo con l'identità
-				Scena[k].Model = translate(Scena[k].Model, vec3(player.posX, player.posY, 0.0));	
-				Scena[k].Model = scale(Scena[k].Model, vec3(50, 50, 1.0));
+				//Scena[k].Model = translate(Scena[k].Model, vec3(player.posX, player.posY, 0.0));
+				Scena[k].Model = translate(Scena[k].Model, vec3(WINDOW_WIDTH/2, WINDOW_HEIGHT /2, 0.0));
+
+				Scena[k].Model = scale(Scena[k].Model, vec3(10, 10, 1.0));
 				//Scena[k].Model = rotate(Scena[k].Model, radians(angolo), vec3(0.0, 0.0, 1.0));
 				//printf("PLAYER POS : %f; %f\n", player.posX, player.posY);
 
@@ -291,7 +232,7 @@ void drawScene(void)
 				//printf("PLAYER BB : %f, %f --- %f, %f\n\n", player.figura.tl_model.x, player.figura.tl_model.y, player.figura.br_model.x, player.figura.br_model.y);
 			
 			}
-
+			/*
 			if (k == 1) {
 				Scena[k].Model = mat4(1.0); //Inizializzo con l'identità
 				Scena[k].Model = translate(Scena[k].Model, vec3(nemico1.posX, nemico1.posY, 0.0));
@@ -339,13 +280,14 @@ void drawScene(void)
 				nemico3.figura.tl_model = tl;
 				//printf("posx del nemico 2: %f\n", nemico2.posX);
 
-			}
+			}*/
 
 			//Devo passare allo shader le info su dove andare a prendere le informazioni sulle variabili uniformi
 			glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(Scena[k].Model));
 			glBindVertexArray(Scena[k].VAO);
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glDrawArrays(GL_TRIANGLE_FAN, 0, Scena[k].nv-6);
+			//glDrawArrays(GL_TRIANGLE_FAN, Scena[k].nv - 12,6);
 
 			
 
@@ -379,7 +321,7 @@ void drawScene(void)
 
 void updateAngolo(int value) {
 	angolo += 1;
-	glutTimerFunc(80, updateAngolo, 0);
+	glutTimerFunc(60, updateAngolo, 0);
 
 	glutPostRedisplay();
 }
@@ -474,9 +416,9 @@ int main(int argc, char* argv[])
 
 	//TODO 
 	inizializzaEntity();
-	glutTimerFunc(25, update, 0);
+	//glutTimerFunc(25, update, 0);
 	glutTimerFunc(25, updateAngolo, 0);
-	glutTimerFunc(25, updateAsteroidi, 0);
+	glutTimerFunc(60, updateAsteroidi, 0);
 	glewExperimental = GL_TRUE;
 	glewInit();
 	INIT_SHADER();
