@@ -136,6 +136,7 @@ void resettaPosizionePlayer() {
 
 void costruisci_pod(vec4 col_primario, vec4 col_secondario, vec4 col_accenti, Figura* fig) {
 	float* t;
+	float stepA = (PI) / fig->nTriangles;
 
 	/*fig->CP.push_back(vec3(0.0, -10.0, 0.0));
 	fig->CP.push_back(vec3(7.0, -10.0, 0.0));*/
@@ -163,13 +164,27 @@ void costruisci_pod(vec4 col_primario, vec4 col_secondario, vec4 col_accenti, Fi
 	fig->vertici.at(0) = vec3(0.0, -6.0, 0.0);	//QUA CAMBIO IL CENTRO DELLA MESH DI HERMITE PER IL MIO SCOPO
 	//fig->colors.push_back(vec4(1.0, 0.0, 0.0, 1.0));
 	
+	//Porta
+	fig->vertici.push_back(vec3(2.0, -6.0, 0.0));
+	fig->colors.push_back(col_secondario);
+	fig->vertici.push_back(vec3(2.0, -2.0, 0.0));
+	fig->colors.push_back(col_secondario);
+	fig->vertici.push_back(vec3(-2.0, -6.0, 0.0));
+	fig->colors.push_back(col_secondario);
+	fig->vertici.push_back(vec3(-2.0, -6.0, 0.0));
+	fig->colors.push_back(col_secondario);
+	fig->vertici.push_back(vec3(-2.0, -2.0, 0.0));
+	fig->colors.push_back(col_secondario);
+	fig->vertici.push_back(vec3(2.0, -2.0, 0.0));
+	fig->colors.push_back(col_secondario);
+
+	//Parte inferiore della nave
 	fig->vertici.push_back(vec3(10.0, -6.0, 0.0));
 	fig->colors.push_back(col_secondario);
 	fig->vertici.push_back(vec3(7.0, -10.0, 0.0));
 	fig->colors.push_back(col_secondario);
 	fig->vertici.push_back(vec3(-7.0, -10.0, 0.0));
 	fig->colors.push_back(col_secondario);
-
 	fig->vertici.push_back(vec3(-7.0, -10.0, 0.0));
 	fig->colors.push_back(col_secondario);
 	fig->vertici.push_back(vec3(-10.0, -6.0, 0.0));
@@ -178,11 +193,30 @@ void costruisci_pod(vec4 col_primario, vec4 col_secondario, vec4 col_accenti, Fi
 	fig->colors.push_back(col_secondario);
 
 
+	//Antenne
+	fig->vertici.push_back(vec3(-7.0, 4.0, 0.0));
+	fig->colors.push_back(col_accenti);
+	fig->vertici.push_back(vec3(-8.0, 8.0, 0.0));
+	fig->colors.push_back(col_accenti);
+	fig->vertici.push_back(vec3(-6.0, 6.0, 0.0));
+	fig->colors.push_back(col_accenti);
+
+	fig->vertici.push_back(vec3(7.0, 4.0, 0.0));
+	fig->colors.push_back(col_accenti);
+	fig->vertici.push_back(vec3(8.0, 8.0, 0.0));
+	fig->colors.push_back(col_accenti);
+	fig->vertici.push_back(vec3(6.0, 6.0, 0.0));
+	fig->colors.push_back(col_accenti);
 
 	fig->nv = fig->vertici.size();
 
 	pair<vec4, vec4> boundingBoxPair = calcolaBoundingBox(fig);
 	fig->tl_original = boundingBoxPair.first;
 	fig->br_original = boundingBoxPair.second;
+
+
+}
+
+void costruisci_antenne(vec4 col_primario, Figura* fig1, Figura* fig2) {
 
 }
