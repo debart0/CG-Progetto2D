@@ -73,10 +73,10 @@ void InterpolazioneHermite(float* t, Figura* Fig, vec4 color_top, vec4 color_bot
 
 }
 
-pair<vec4, vec4> calcolaBoundingBox(Figura* fig) {
+vector<vec4> calcolaBoundingBox(Figura* fig) {
 	vec3 min = fig->vertici.at(0);
 	vec3 max = fig->vertici.at(0);
-	vec3 topLeftCorner, bottomRightCorner;
+	vec3 topLeftCorner, bottomRightCorner, topRightCorner, bottomLeftCorner;
 	for (vec3 vertice : fig->vertici) {
 		if (min.x > vertice.x) min.x = vertice.x;
 		if (min.y > vertice.y) min.y = vertice.y;
@@ -84,10 +84,16 @@ pair<vec4, vec4> calcolaBoundingBox(Figura* fig) {
 		if (max.y < vertice.y) max.y = vertice.y;
 
 	}
+	//Angoli principali
 	topLeftCorner.x = min.x;
 	topLeftCorner.y = max.y;
 	bottomRightCorner.x = max.x;
 	bottomRightCorner.y = min.y;
+	//Angoli secondari
+	topRightCorner.x = max.x;
+	topRightCorner.y = max.y;
+	bottomLeftCorner.x = min.x;
+	bottomLeftCorner.y = min.y;
 
 	//Aggiungo i vertici della spezzata per costruire il bounding box
 	fig->vertici.push_back(vec3(min.x, min.y, 0.0));
@@ -104,8 +110,70 @@ pair<vec4, vec4> calcolaBoundingBox(Figura* fig) {
 	fig->colors.push_back(vec4(1.0, 0.0, 0.0, 1.0));
 	fig->nv = fig->vertici.size();
 
-	pair<vec4, vec4> pair = make_pair(vec4(topLeftCorner, 1.0), vec4(bottomRightCorner, 1.0));
-	return pair;
+	//pair<vec4, vec4> pair = make_pair(vec4(topLeftCorner, 1.0), vec4(bottomRightCorner, 1.0));
+	vector<vec4> boundingBox;
+	boundingBox.push_back(vec4(topLeftCorner, 1.0));
+	boundingBox.push_back(vec4(bottomRightCorner, 1.0));
+
+	boundingBox.push_back(vec4(topRightCorner, 1.0));
+	boundingBox.push_back(vec4(bottomLeftCorner, 1.0));
+	printf("VECTOR\n");
+	for (vec4 vertice : boundingBox) {
+		printf("vert:\t%f, %f\n", vertice.x, vertice.y);
+	}
+	return boundingBox;
+}
+
+void assestaRotazioneBoundingBox(Figura* fig)
+{
+	vector<vec3> tmp { fig->TL_model, fig->BR_model, fig->TR_model, fig->BL_model };
+	//printf("VECTOR\n");
+	vec3 min = fig->TL_model;
+	vec3 max = fig->TL_model;
+	vec3 topLeftCorner, bottomRightCorner, topRightCorner, bottomLeftCorner;
+	for (vec3 vertice : tmp) {
+		//printf("vert:\t%f, %f\n", vertice.x, vertice.y);
+		if (min.x > vertice.x) min.x = vertice.x;
+		if (min.y > vertice.y) min.y = vertice.y;
+		if (max.x < vertice.x) max.x = vertice.x;
+		if (max.y < vertice.y) max.y = vertice.y;
+	}
+	//Angoli principali
+	topLeftCorner.x = min.x;
+	topLeftCorner.y = max.y;
+	bottomRightCorner.x = max.x;
+	bottomRightCorner.y = min.y;
+	//Angoli secondari
+	topRightCorner.x = max.x;
+	topRightCorner.y = max.y;
+	bottomLeftCorner.x = min.x;
+	bottomLeftCorner.y = min.y;
+
+	//Numero di vertici totali:
+	int nv = fig->nv;
+	//fig->vertici.resize(nv - 6);
+	//Aggiungo i vertici della spezzata per costruire il bounding box
+	fig->vertici[nv - 6] = (vec3(min.x, min.y, 0.0));
+	fig->vertici[nv-5]=(vec3(max.x, min.y, 0.0));
+	fig->vertici[nv-4]=(vec3(max.x, max.y, 0.0));
+	fig->vertici[nv-3]=(vec3(min.x, min.y, 0.0));
+	fig->vertici[nv-2]=(vec3(min.x, max.y, 0.0));
+	fig->vertici[nv-1]=(vec3(max.x, max.y, 0.0));
+
+	/*fig->vertici.push_back((vec3(min.x, min.y, 0.0)));
+	fig->vertici.push_back((vec3(max.x, min.y, 0.0)));
+	fig->vertici.push_back((vec3(max.x, max.y, 0.0)));
+	fig->vertici.push_back((vec3(min.x, min.y, 0.0)));
+	fig->vertici.push_back((vec3(min.x, max.y, 0.0)));
+	fig->vertici.push_back((vec3(max.x, max.y, 0.0)));
+	fig->nv = fig->vertici.size();*/
+
+
+	fig->TL_model = vec4(topLeftCorner, 1.0);
+	fig->BR_model = vec4(bottomRightCorner, 1.0);
+
+	fig->TR_model = vec4(topRightCorner, 1.0);
+	fig->BL_model = vec4(bottomLeftCorner, 1.0);
 }
 
 void inizializzaEntity() {
@@ -201,9 +269,12 @@ void costruisci_pod(vec4 col_primario, vec4 col_secondario, vec4 col_accenti, Fi
 
 	fig->nv = fig->vertici.size();
 
-	pair<vec4, vec4> boundingBoxPair = calcolaBoundingBox(fig);
-	fig->TL_original = boundingBoxPair.first;
-	fig->BR_original = boundingBoxPair.second;
+	vector<vec4> boundingBox = calcolaBoundingBox(fig);
+	fig->TL_original = boundingBox[0];
+	fig->BR_original = boundingBox[1];
+
+	fig->TR_original = boundingBox[2];
+	fig->BL_original = boundingBox[3];
 
 
 }

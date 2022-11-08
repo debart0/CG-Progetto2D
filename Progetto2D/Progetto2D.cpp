@@ -11,7 +11,7 @@
 ////////////////////////////////////// Dichiarazione variabili //////////////////////////////////////
 
 static unsigned int programId, MatModel, MatProj;
-mat4 Projection;
+mat4 Projection, Identity;
 float angolo = 0.0, s = 1, delta_x = 0, delta_y = 0, player_dx = 0, player_dy = 0;
 float enemy_rotation_1 = 0.5, enemy_rotation_2 = -0.4, enemy_rotation_3 = 0.7;
 vec2 player_default_pos = { WINDOW_WIDTH / 2, WINDOW_HEIGHT };
@@ -61,8 +61,7 @@ void crea_VAO_Vector(Figura* fig)
 	glEnableVertexAttribArray(1);
 
 }
-
-void costruisci_cuore(float cx, float cy, float raggiox, float raggioy, Figura* fig) {
+/*void costruisci_cuore(float cx, float cy, float raggiox, float raggioy, Figura* fig) {
 
 	int i;
 	float stepA = (2 * PI) / fig->nTriangles;
@@ -88,7 +87,7 @@ void costruisci_cuore(float cx, float cy, float raggiox, float raggioy, Figura* 
 	fig->TL_original = boundingBoxPair.first;
 	fig->BR_original = boundingBoxPair.second;
 	//printf("Bounding Box\nTOP LEFT: %f, %f\nBOT RIGHT: %f, %f\n", topLeftCorner.x, topLeftCorner.y, bottomRightCorner.x, bottomRightCorner.y);
-}
+}*/
 
 void costruisci_cerchio(vec4 color_center, vec4 color_edges, Figura* fig) {
 
@@ -155,9 +154,12 @@ void costruisci_asteroide(vec4 color_top, vec4 color_bot, Figura* forma) {
 	forma->colors.push_back(vec4(1.0, 0.0, 0.0, 1.0));
 	forma->nv = forma->vertici.size();
 
-	pair<vec4, vec4> boundingBoxPair = calcolaBoundingBox(forma);
-	forma->TL_original = boundingBoxPair.first;
-	forma->BR_original = boundingBoxPair.second;
+	vector<vec4> boundingBox = calcolaBoundingBox(forma);
+	forma->TL_original = boundingBox[0];
+	forma->BR_original = boundingBox[1];
+
+	forma->TR_original = boundingBox[2];
+	forma->BL_original = boundingBox[3];
 
 }
 
@@ -249,6 +251,7 @@ void drawScene(void)
 		//printf("PLAYER POS : %f; %f\n", player.posX, player.posY);
 
 		vec4 br = player.figura.BR_original; vec4 tl = player.figura.TL_original;
+		vec4 bl = player.figura.BL_original; vec4 tr = player.figura.TR_original;
 		br = Scena[0].Model * br; tl = Scena[0].Model * tl;
 
 		player.figura.BR_model = br;
@@ -256,18 +259,27 @@ void drawScene(void)
 
 		/*NEMICI*/
 		Scena[1].Model = mat4(1.0); //Inizializzo con l'identità
-		Scena[1].Model = translate(Scena[1].Model, vec3(nemico1.posX, nemico1.posY, 0.0));
+		//Scena[1].Model = translate(Scena[1].Model, vec3(nemico1.posX, nemico1.posY, 0.0));
+		Scena[1].Model = translate(Scena[1].Model, vec3(250, 500, 0.0));
+
 		Scena[1].Model = scale(Scena[1].Model, vec3(5, 5, 1.0));
-
-		br = nemico1.figura.BR_original;  tl = nemico1.figura.TL_original;
-		br = Scena[1].Model * br; tl = Scena[1].Model * tl;
-
 		Scena[1].Model = rotate(Scena[1].Model, radians(angolo * enemy_rotation_1), vec3(0.0, 0.0, 1.0));
+
+		br = nemico1.figura.BR_original;  tl = nemico1.figura.TL_original; 
+		bl = nemico1.figura.BL_original; tr = nemico1.figura.TR_original;
+		br = Scena[1].Model * br; tl = Scena[1].Model * tl; 
+		bl = Scena[1].Model * bl; tr = Scena[1].Model * tr;
+
 
 		nemico1.figura.BR_model = br;
 		nemico1.figura.TL_model = tl;
-		//printf("dx del nemico 1: %f\n", nemico1.dx);
-		//printf("ENEMY BB : %f, %f --- %f, %f\n\n", nemico1.figura.tl_model.x, nemico1.figura.tl_model.y, nemico1.figura.br_model.x, nemico1.figura.br_model.y);
+		nemico1.figura.BL_model = bl;
+		nemico1.figura.TR_model = tr;
+		printf("\n\nENEMY BB : %f, %f --- %f, %f\n", nemico1.figura.TL_model.x, nemico1.figura.TL_model.y, nemico1.figura.BR_model.x, nemico1.figura.BR_model.y);
+		printf("         : %f, %f --- %f, %f\n", nemico1.figura.BL_model.x, nemico1.figura.BL_model.y, nemico1.figura.TR_model.x, nemico1.figura.TR_model.y);
+		assestaRotazioneBoundingBox(&nemico1.figura);
+		printf("ROTATED  : %f, %f --- %f, %f\n", nemico1.figura.TL_model.x, nemico1.figura.TL_model.y, nemico1.figura.BR_model.x, nemico1.figura.BR_model.y);
+		printf("         : %f, %f --- %f, %f", nemico1.figura.BL_model.x, nemico1.figura.BL_model.y, nemico1.figura.TR_model.x, nemico1.figura.TR_model.y);
 	
 
 	
@@ -282,6 +294,8 @@ void drawScene(void)
 
 		nemico2.figura.BR_model = br;
 		nemico2.figura.TL_model = tl;
+		//assestaRotazioneBoundingBox(&nemico2.figura);
+
 		//printf("posx del nemico 2: %f\n", nemico2.posX);
 
 
@@ -297,6 +311,8 @@ void drawScene(void)
 
 		nemico3.figura.BR_model = br;
 		nemico3.figura.TL_model = tl;
+		//assestaRotazioneBoundingBox(&nemico3.figura);
+
 		//printf("posx del nemico 2: %f\n", nemico2.posX);
 
 	
@@ -325,9 +341,14 @@ void drawScene(void)
 		if (drawBB == TRUE)
 		{
 			for (int j = 0; j <= 3; j++) {
+
+				/*Identity = translate(Identity, vec3(250, 500, 0.0));
+				Identity = scale(Identity, vec3(5, 5, 1.0));
+				glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(Identity));*/
+
 				glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(Scena[j].Model));
-				glBindVertexArray(Scena[j].VAO);
-				glDrawArrays(GL_LINE_STRIP, Scena[j].nv - 6, 6);
+				glBindVertexArray(Scena[1].VAO);
+				glDrawArrays(GL_LINE_STRIP, Scena[1].nv - 6, 6);
 				glBindVertexArray(0);
 
 			}
@@ -358,9 +379,9 @@ void drawScene(void)
 
 void updateAngolo(int value) {
 	if (!isPaused) {
-		angolo += 1;
+		angolo += 45;
 	}
-	glutTimerFunc(60, updateAngolo, 0);
+	glutTimerFunc(480, updateAngolo, 0);
 
 	glutPostRedisplay();
 }
@@ -455,6 +476,7 @@ int main(int argc, char* argv[])
 
 	//TODO 
 	inizializzaEntity();
+	Identity = mat4(1.0);
 	glutTimerFunc(25, update, 0);
 	glutTimerFunc(25, updateAngolo, 0);
 	glutTimerFunc(60, updateAsteroidi, 0);
