@@ -107,10 +107,6 @@ pair<vec4, vec4> calcolaBoundingBox(Figura* fig) {
 	pair<vec4, vec4> pair = make_pair(vec4(topLeftCorner, 1.0), vec4(bottomRightCorner, 1.0));
 	return pair;
 }
-/*
-pair<float, float> calcolaDimensioniFigura(Figura* fig) {
-	pair<float,float> pair = make_pair(fig->tl_original)
-}*/
 
 void inizializzaEntity() {
 	player.posX = player_default_pos.x; player.posY = player_default_pos.y; player.speed = PLAYER_SPEED;
@@ -128,11 +124,6 @@ void inizializzaEntity() {
 
 }
 
-void resettaPosizionePlayer() {
-	player.posX = player_default_pos.x;
-	player.posY = player_default_pos.y;
-	printf("Posizione resettata\n");
-}
 
 void costruisci_pod(vec4 col_primario, vec4 col_secondario, vec4 col_accenti, Figura* fig) {
 	float* t;
@@ -211,12 +202,37 @@ void costruisci_pod(vec4 col_primario, vec4 col_secondario, vec4 col_accenti, Fi
 	fig->nv = fig->vertici.size();
 
 	pair<vec4, vec4> boundingBoxPair = calcolaBoundingBox(fig);
-	fig->tl_original = boundingBoxPair.first;
-	fig->br_original = boundingBoxPair.second;
+	fig->TL_original = boundingBoxPair.first;
+	fig->BR_original = boundingBoxPair.second;
 
 
 }
 
 void costruisci_antenne(vec4 col_primario, Figura* fig1, Figura* fig2) {
 
+}
+
+void costruisci_fondale(vec4 col_top, vec4 col_bottom, Figura* fig)
+{
+	fig->vertici.push_back(vec3(0.0, 0.0, 0.0));
+	fig->vertici.push_back(vec3(1.0, 0.0, 0.0));
+	fig->vertici.push_back(vec3(0.0, 1.0, 0.0));
+	fig->vertici.push_back(vec3(1.0, 1.0, 0.0));
+	fig->colors.push_back(col_bottom);
+	fig->colors.push_back(col_top);
+	fig->colors.push_back(col_top);
+	fig->colors.push_back(col_top);
+	fig->nv = fig->vertici.size();
+
+	//Costruzione matrice di Modellazione Sole, che rimane la stessa(non si aggiorna)
+	fig->Model = mat4(1.0);
+	fig->Model = translate(fig->Model, vec3(0.0, 0.0, 0.0));
+	fig->Model = scale(fig->Model, vec3(WINDOW_WIDTH, WINDOW_HEIGHT, 1.0));
+}
+
+void resettaPosizionePlayer()
+{
+	player.posX = player_default_pos.x;
+	player.posY = player_default_pos.y;
+	printf("Posizione resettata\n");
 }

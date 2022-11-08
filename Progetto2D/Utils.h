@@ -6,6 +6,8 @@ void costruisci_pod(vec4 col_primario, vec4 col_secondario, vec4 col_accenti, Fi
 
 void costruisci_antenne(vec4 col_primario, Figura* fig1, Figura* fig2);
 
+void costruisci_fondale(vec4 col_top, vec4 col_bottom, Figura* fig);
+
 //Funzione per l'interpolazione delle curve di Hermite
 void InterpolazioneHermite(float* t, Figura* Fig, vec4 color_top, vec4 color_bot);
 

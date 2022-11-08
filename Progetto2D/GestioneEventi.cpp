@@ -30,11 +30,11 @@ void keyboardPressedEvent(unsigned char key, int x, int y) {
 		drawBB = TRUE;
 		break;
 	case 'p':
-		printf("PAUSA\n");
+		printf("\nPAUSA\n");
 		isPaused = !isPaused;
 		break;
 	case ESC:
-		printf("Prova uscita");
+		printf("\nUSCITA\n");
 		exit(0);
 		break;
 	}
@@ -82,11 +82,11 @@ bool checkCollision(vec4 tl1, vec4 br1, vec4 tl2, vec4 br2) {
 }
 
 bool checkCollision(Figura fig1, Figura fig2) {
-	bool collisionX = fig1.br_model.x >= fig2.tl_model.x &&
-		fig1.tl_model.x <= fig2.br_model.x;
+	bool collisionX = fig1.BR_model.x >= fig2.TL_model.x &&
+		fig1.TL_model.x <= fig2.BR_model.x;
 
-	bool collisionY = fig1.br_model.y <= fig2.tl_model.y &&
-		fig1.tl_model.y >= fig2.br_model.y;
+	bool collisionY = fig1.BR_model.y <= fig2.TL_model.y &&
+		fig1.TL_model.y >= fig2.BR_model.y;
 	//Si ha collisione se c'è collisione sia nella direzione x che nella direzione y
 
 	return collisionX && collisionY;
@@ -97,8 +97,8 @@ void update(int a) {
 	if (!isPaused) {//TODO RIMETTERE COLLISIONE CON NEMICO3
 		
 		bool moving = false;
-		float width = player.figura.br_model.x - player.figura.tl_model.x;
-		float height = player.figura.tl_model.y - player.figura.br_model.y;
+		float width = player.figura.BR_model.x - player.figura.TL_model.x;
+		float height = player.figura.TL_model.y - player.figura.BR_model.y;
 		//printf("posizione player: %f\n",player.posX);
 		player.posY -= gravity;
 		if (pressing_left){
@@ -143,40 +143,31 @@ void update(int a) {
 			score += 1;
 			printf("Score: %d\n", score);
 		
-	}
-	//TODO FARE QUALCOSA PER AUMENTARE LO SCORE
+		}
 	}
 	glutPostRedisplay();
 	glutTimerFunc(24, update, 0);
 }
 
 void updateAsteroidi(int a) {
-	//Posso anche non usare width per la larghezza, mi dovrebbero bastare le coordinate dei corner
-	nemico1.posX += nemico1.speed;
-	nemico2.posX -= nemico2.speed;
-	nemico3.posX += nemico3.speed;
-	if (nemico1.figura.tl_model.x >= WINDOW_WIDTH) {
-		float width_nemico1 = nemico1.figura.br_model.x - nemico1.posX;
-		nemico1.posX = -width_nemico1;
+	if (!isPaused) {
+		//Posso anche non usare width per la larghezza, mi dovrebbero bastare le coordinate dei corner
+		nemico1.posX += nemico1.speed;
+		nemico2.posX -= nemico2.speed;
+		nemico3.posX += nemico3.speed;
+		if (nemico1.figura.TL_model.x >= WINDOW_WIDTH) {
+			float width_nemico1 = nemico1.figura.BR_model.x - nemico1.posX;
+			nemico1.posX = -width_nemico1;
+		}
+		if (nemico2.figura.BR_model.x <= 0) {
+			float width_nemico2 = nemico2.figura.BR_model.x - nemico2.posX;
+			nemico2.posX = WINDOW_WIDTH + width_nemico2;
+		}
+		if (nemico3.figura.TL_model.x >= WINDOW_WIDTH) {
+			float width_nemico3 = nemico3.figura.BR_model.x - nemico3.posX;
+			nemico3.posX = -width_nemico3;
+		}
 	}
-	if (nemico2.figura.br_model.x <= 0) {
-		float width_nemico2 = nemico2.figura.br_model.x - nemico2.posX;
-		nemico2.posX = WINDOW_WIDTH + width_nemico2;
-	}
-	if (nemico3.figura.tl_model.x >= WINDOW_WIDTH) {
-		float width_nemico3 = nemico3.figura.br_model.x - nemico3.posX;
-		nemico3.posX = -width_nemico3;
-	}
-	//TODO devo guardare come gestire il rimbalzo sul lab pallina
-	/*
-	if (nemico1.figura.br_model.x <= WINDOW_WIDTH) {
-		//printf("Nemico 1 sinistra. TL X: %f\n", nemico1.figura.tl_model.x);
-		nemico1.dx -= (float)nemico1.speed;
-	}
-	if (nemico1.figura.tl_model.x > 0) {
-		//printf("Nemico 1 sinistra. TL X: %f\n", nemico1.figura.tl_model.x);
-		nemico1.dx += (float)nemico1.speed;
-	}*/
 	
 	glutTimerFunc(24, updateAsteroidi, 0);
 }

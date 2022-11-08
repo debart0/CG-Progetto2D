@@ -28,13 +28,19 @@ typedef struct {
 	//Matrice di Modellazione: Traslazione*Rotazione*Scala
 	mat4 Model;
 	//Vertici della bounding box: TL sta per top left; BR sta per bottom right
-	vec4 tl_original;	//original è prima di subire le trasformazioni di Model,
-	vec4 tl_model;	//model è dopo ogni trasformazione
-	vec4 br_original;
-	vec4 br_model;
+	vec4 TL_original;	//original è prima di subire le trasformazioni di Model,
+	vec4 TL_model;	//model è dopo ogni trasformazione
+	vec4 BR_original;
+	vec4 BR_model;
 	//Larghezza e altezza della figura (e quindi della bounding box)
 	float width;
 	float height;
+	//vertici extra della bounding box (ovvero quello top-right e bottom-left)
+	//Questi vertici extra sarebbero superflui, se non dovessi ricalcolare la BB dopo ogni rotazione
+	vec4 TR_original;
+	vec4 TR_model;
+	vec4 BL_original;
+	vec4 BL_model;
 } Figura;
 
 typedef struct {

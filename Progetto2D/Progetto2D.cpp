@@ -28,13 +28,14 @@ bool pressing_left = false;
 bool pressing_right = false;
 vec4 asteroide_col_bot = { 0.181, 0.181, 0.185, 1.0 }, asteroide_col_top = { 0.076, 0.076, 0.084, 1.0 };
 vec4 pod_col_primario = vec4(0.80, 0.82, 0.84, 1.0), pod_col_secondario = vec4(0.09, 0.10, 0.10, 1.0), pod_col_accenti = vec4(0.91, 0.58, 0.11, 1.0);
+vec4 fondale_col_top = vec4(0.02, 0.13, 0.29, 1.0), fondale_col_bottom = vec4(0.26, 0.05, 0.29, 1.0);
 unsigned int loc_res, loc_mouse;
 vec2 mouse, res;
 
 vector<Figura> Scena;
 
 Figura Pod = {}, Porta = {}, Antenna1 = {}, Antenna2 = {};
-Figura Cuore = {};
+Figura Cuore = {}, Fondale = {};
 Figura Asteroide = {}, Asteroide1 = {}, Asteroide2 = {}, Asteroide3 = {};
 Entity player = {}, nemico1 = {}, nemico2 = {}, nemico3 = {};
 
@@ -84,8 +85,8 @@ void costruisci_cuore(float cx, float cy, float raggiox, float raggioy, Figura* 
 	fig->nv = fig->vertici.size();
 
 	pair<vec4, vec4> boundingBoxPair = calcolaBoundingBox(fig);
-	fig->tl_original = boundingBoxPair.first;
-	fig->br_original = boundingBoxPair.second;
+	fig->TL_original = boundingBoxPair.first;
+	fig->BR_original = boundingBoxPair.second;
 	//printf("Bounding Box\nTOP LEFT: %f, %f\nBOT RIGHT: %f, %f\n", topLeftCorner.x, topLeftCorner.y, bottomRightCorner.x, bottomRightCorner.y);
 }
 
@@ -155,8 +156,8 @@ void costruisci_asteroide(vec4 color_top, vec4 color_bot, Figura* forma) {
 	forma->nv = forma->vertici.size();
 
 	pair<vec4, vec4> boundingBoxPair = calcolaBoundingBox(forma);
-	forma->tl_original = boundingBoxPair.first;
-	forma->br_original = boundingBoxPair.second;
+	forma->TL_original = boundingBoxPair.first;
+	forma->BR_original = boundingBoxPair.second;
 
 }
 
@@ -202,6 +203,10 @@ void INIT_VAO(void) {
 	crea_VAO_Vector(&Asteroide3);
 	Scena.push_back(Asteroide3);
 
+	costruisci_fondale(fondale_col_top, fondale_col_bottom, &Fondale);
+	crea_VAO_Vector(&Fondale);
+	Scena.push_back(Fondale);
+
 	//Qua metto gli "extra", ovvero dettagli in più 
 	/*costruisci_antenne(pod_col_accenti, &Antenna1, &Antenna2);
 	crea_VAO_Vector(&player.figura);
@@ -223,11 +228,17 @@ void drawScene(void)
 	res.y = (float)WINDOW_HEIGHT;
 	glUniform2f(loc_res, res.x, res.y);
 	glUniform2f(loc_mouse, mouse.x, mouse.y);
-	glClearColor(0.0, 1.0, 0.0, 1.0);
+	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glUniformMatrix4fv(MatProj, 1, GL_FALSE, value_ptr(Projection)); //Questa può andare fuori dal ciclo xk nn cambia
+	
+	//FONDALE, prima disegno il fondale perché deve stare dietro alla scena
+	glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(Scena[4].Model));
+	glBindVertexArray(Scena[4].VAO);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, Scena[4].nv);
 	if (!gameOver)
 	{
+		//PLAYER
 		Scena[0].Model = mat4(1.0); //Inizializzo con l'identità
 		Scena[0].Model = translate(Scena[0].Model, vec3(player.posX, player.posY, 0.0));
 		//Scena[0].Model = translate(Scena[0].Model, vec3(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 0.0)); 
@@ -237,25 +248,24 @@ void drawScene(void)
 		//Scena[k].Model = rotate(Scena[0].Model, radians(angolo), vec3(0.0, 0.0, 1.0));
 		//printf("PLAYER POS : %f; %f\n", player.posX, player.posY);
 
-		vec4 br = player.figura.br_original; vec4 tl = player.figura.tl_original;
+		vec4 br = player.figura.BR_original; vec4 tl = player.figura.TL_original;
 		br = Scena[0].Model * br; tl = Scena[0].Model * tl;
 
-		player.figura.br_model = br;
-		player.figura.tl_model = tl;
-		//printf("PLAYER BB : %f, %f --- %f, %f\n\n", player.figura.tl_model.x, player.figura.tl_model.y, player.figura.br_model.x, player.figura.br_model.y);
-	
-	
+		player.figura.BR_model = br;
+		player.figura.TL_model = tl;
+
+		/*NEMICI*/
 		Scena[1].Model = mat4(1.0); //Inizializzo con l'identità
 		Scena[1].Model = translate(Scena[1].Model, vec3(nemico1.posX, nemico1.posY, 0.0));
 		Scena[1].Model = scale(Scena[1].Model, vec3(5, 5, 1.0));
 
-		br = nemico1.figura.br_original;  tl = nemico1.figura.tl_original;
+		br = nemico1.figura.BR_original;  tl = nemico1.figura.TL_original;
 		br = Scena[1].Model * br; tl = Scena[1].Model * tl;
 
 		Scena[1].Model = rotate(Scena[1].Model, radians(angolo * enemy_rotation_1), vec3(0.0, 0.0, 1.0));
 
-		nemico1.figura.br_model = br;
-		nemico1.figura.tl_model = tl;
+		nemico1.figura.BR_model = br;
+		nemico1.figura.TL_model = tl;
 		//printf("dx del nemico 1: %f\n", nemico1.dx);
 		//printf("ENEMY BB : %f, %f --- %f, %f\n\n", nemico1.figura.tl_model.x, nemico1.figura.tl_model.y, nemico1.figura.br_model.x, nemico1.figura.br_model.y);
 	
@@ -265,16 +275,14 @@ void drawScene(void)
 		Scena[2].Model = translate(Scena[2].Model, vec3(nemico2.posX, nemico2.posY, 0.0));
 		Scena[2].Model = scale(Scena[2].Model, vec3(7, 7, 1.0));
 
-		 br = nemico2.figura.br_original;  tl = nemico2.figura.tl_original;
+		br = nemico2.figura.BR_original;  tl = nemico2.figura.TL_original;
 		br = Scena[2].Model * br; tl = Scena[2].Model * tl;
 
 		Scena[2].Model = rotate(Scena[2].Model, radians(angolo*enemy_rotation_2), vec3(0.0, 0.0, 1.0));
 
-		nemico2.figura.br_model = br;
-		nemico2.figura.tl_model = tl;
+		nemico2.figura.BR_model = br;
+		nemico2.figura.TL_model = tl;
 		//printf("posx del nemico 2: %f\n", nemico2.posX);
-
-	
 
 
 	
@@ -282,18 +290,18 @@ void drawScene(void)
 		Scena[3].Model = translate(Scena[3].Model, vec3(nemico3.posX, nemico3.posY, 0.0));
 		Scena[3].Model = scale(Scena[3].Model, vec3(4, 6, 1.0));
 
-		 br = nemico3.figura.br_original;  tl = nemico3.figura.tl_original;
+		br = nemico3.figura.BR_original;  tl = nemico3.figura.TL_original;
 		br = Scena[3].Model * br; tl = Scena[3].Model * tl;
 
 		Scena[3].Model = rotate(Scena[3].Model, radians(angolo*enemy_rotation_3), vec3(0.0, 0.0, 1.0));
 
-		nemico3.figura.br_model = br;
-		nemico3.figura.tl_model = tl;
+		nemico3.figura.BR_model = br;
+		nemico3.figura.TL_model = tl;
 		//printf("posx del nemico 2: %f\n", nemico2.posX);
 
 	
 
-	//Devo passare allo shader le info su dove andare a prendere le informazioni sulle variabili uniformi
+		//Devo passare allo shader le info su dove andare a prendere le informazioni sulle variabili uniformi
 		glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(Scena[0].Model));
 		glBindVertexArray(Scena[0].VAO);
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -311,6 +319,7 @@ void drawScene(void)
 			glBindVertexArray(Scena[k].VAO);
 			glDrawArrays(GL_TRIANGLE_FAN, 0, Scena[k].nv - 6);
 		}
+
 		
 		//Disegno Bounding Box
 		if (drawBB == TRUE)
@@ -324,7 +333,8 @@ void drawScene(void)
 			}
 		}
 
-		if (checkCollision(player.figura, nemico1.figura) || checkCollision(player.figura, nemico2.figura)) {
+		if (checkCollision(player.figura, nemico1.figura) || checkCollision(player.figura, nemico2.figura)
+			|| checkCollision(player.figura, nemico3.figura)) {
 			printf("COLLISIONE\n");
 			//resetta posizione
 			//togli una vita
@@ -347,7 +357,9 @@ void drawScene(void)
 }
 
 void updateAngolo(int value) {
-	angolo += 1;
+	if (!isPaused) {
+		angolo += 1;
+	}
 	glutTimerFunc(60, updateAngolo, 0);
 
 	glutPostRedisplay();
