@@ -46,10 +46,10 @@ void keyboardPressedEvent(unsigned char key, int x, int y) {
 void keyboardReleasedEvent(unsigned char key, int x, int y) {
 	switch (key)
 	{
-	case 'a':
+	case 'a': case KEY_LEFT:
 		pressing_left = false;
 		break;
-	case 'd':
+	case 'd': case KEY_RIGHT:
 		pressing_right = false;
 		break;
 	case 'b':
@@ -61,6 +61,34 @@ void keyboardReleasedEvent(unsigned char key, int x, int y) {
 
 }
 
+void specialKeyPressedEvent(int key, int x, int y) {
+	switch (key)
+	{
+	case GLUT_KEY_LEFT:
+		pressing_left = true;
+		player.posX -= player.speed;
+		break;
+	case GLUT_KEY_RIGHT:
+		pressing_right = true;
+		player.posX += player.speed;
+	default:
+		break;
+	}
+}
+
+void specialKeyReleasedEvent(int key, int x, int y) {
+	switch (key)
+	{
+	case GLUT_KEY_LEFT:
+		pressing_left = false;
+		break;
+	case GLUT_KEY_RIGHT:
+		pressing_right = false;
+		break;
+	default:
+		break;
+	}
+}
 
 void mouseClick(int x, int y)
 {

@@ -7,10 +7,15 @@
 #include "Definizioni.h"
 #include "GestioneEventi.h"
 #include "Utils.h"
+#include "GestioneTesto.h"
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 ////////////////////////////////////// Dichiarazione variabili //////////////////////////////////////
 
-static unsigned int programId, MatModel, MatProj;
+static unsigned int programId, programId_text, MatModel, MatProj;
+unsigned int VAO_Text, VBO_Text;
+
 mat4 Projection, Identity;
 float angolo = 0.0, s = 1, delta_x = 0, delta_y = 0, player_dx = 0, player_dy = 0;
 float enemy_rotation_1 = 0.5, enemy_rotation_2 = -0.4, enemy_rotation_3 = 0.7;
@@ -22,6 +27,7 @@ vec2 nemico3_default_pos = {27.0,  WINDOW_HEIGHT / 4.5};
 int drift_orizzontale = 1, gravity = 2;
 int vite = MAX_VITE; int score = 0;
 int pval = 140;
+string vite_string, score_string, gameover_string = "GAME OVER";
 bool isPaused = false, gameOver = false, drawBB = false;
 //Booleani posti a true se si usa il tasto a (spostamento a sinistra) e b (spostamento a destra)
 bool pressing_left = false;
@@ -176,6 +182,12 @@ void INIT_SHADER(void)
 
 	programId = ShaderMaker::createProgram(vertexShader, fragmentShader);
 	glUseProgram(programId);
+
+	//Generazione del program shader per la gestione del testo
+	vertexShader = (char*)"VertexShader_Text.glsl";
+	fragmentShader = (char*)"FragmentShader_Text.glsl";
+
+	programId_text = ShaderMaker::createProgram(vertexShader, fragmentShader);
 }
 
 void INIT_VAO(void) {
@@ -223,8 +235,26 @@ void INIT_VAO(void) {
 	loc_mouse = glGetUniformLocation(programId, "mouse");
 }
 
+void INIT_VAO_Text(void)
+{
+
+	// configure VAO/VBO for texture quads
+	// -----------------------------------
+	glGenVertexArrays(1, &VAO_Text);
+	glGenBuffers(1, &VBO_Text);
+	glBindVertexArray(VAO_Text);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_Text);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
 void drawScene(void)
 {
+	vite_string = "VITE: " + to_string(vite);
+	score_string = "PUNTI: " + to_string(score);
 	int k;
 	res.x = (float)WINDOW_WIDTH;
 	res.y = (float)WINDOW_HEIGHT;
@@ -366,13 +396,18 @@ void drawScene(void)
 				gameOver = true;
 			}
 		}
+		RenderText(programId_text, Projection, vite_string, VAO_Text, VBO_Text, 10, WINDOW_HEIGHT - 50, 0.7f, glm::vec3(1.0, 0.0f, 0.2f));
+		RenderText(programId_text, Projection, score_string, VAO_Text, VBO_Text, 10, WINDOW_HEIGHT - 100, 0.7f, glm::vec3(1.0, 0.0f, 0.2f));
 	}
 	
 	else {
 		printf("GAME OVER\n");
+		RenderText(programId_text, Projection, gameover_string, VAO_Text, VBO_Text, 10, WINDOW_HEIGHT - 50, 0.7f, glm::vec3(1.0, 0.0f, 0.2f));
+
 	}
-
-
+	
+	
+	glUseProgram(programId);
 	glutSwapBuffers();
 
 }
@@ -472,6 +507,8 @@ int main(int argc, char* argv[])
 	glutDisplayFunc(drawScene);
 	glutKeyboardFunc(keyboardPressedEvent);
 	glutKeyboardUpFunc(keyboardReleasedEvent);
+	glutSpecialFunc(specialKeyPressedEvent);
+	glutSpecialUpFunc(specialKeyReleasedEvent);
 	glutPassiveMotionFunc(mouseClick);
 
 	//TODO 
@@ -484,6 +521,10 @@ int main(int argc, char* argv[])
 	glewInit();
 	INIT_SHADER();
 	INIT_VAO();
+
+	INIT_VAO_Text();
+	Init_Freetype();
+
 	buildOpenGLMenu();
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
