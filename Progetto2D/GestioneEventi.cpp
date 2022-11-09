@@ -8,6 +8,7 @@ extern Entity player, nemico1, nemico2, nemico3;
 extern bool isPaused, gameOver, drawBB;
 extern bool pressing_left, pressing_right, moving;
 extern int drift_orizzontale, gravity, score, vite;
+extern float angolo;
 extern vec2 mouse;
 //devo aggiungere questi movimenti alla matrice di traslazione (chiamiamo gli spostamenti dx e dy)
 void keyboardPressedEvent(unsigned char key, int x, int y) {
@@ -46,10 +47,10 @@ void keyboardPressedEvent(unsigned char key, int x, int y) {
 void keyboardReleasedEvent(unsigned char key, int x, int y) {
 	switch (key)
 	{
-	case 'a': case KEY_LEFT:
+	case 'a':
 		pressing_left = false;
 		break;
-	case 'd': case KEY_RIGHT:
+	case 'd':
 		pressing_right = false;
 		break;
 	case 'b':
@@ -116,7 +117,13 @@ bool checkCollision(Figura fig1, Figura fig2) {
 	bool collisionY = fig1.BR_model.y <= fig2.TL_model.y &&
 		fig1.TL_model.y >= fig2.BR_model.y;
 	//Si ha collisione se c'è collisione sia nella direzione x che nella direzione y
-
+	if (collisionX && collisionY) {
+		printf("\nCHECK COLLISION\n");
+		printf("FIG 1  : %f, %f --- %f, %f\n", fig1.TL_model.x, fig1.TL_model.y, fig1.BR_model.x, fig1.BR_model.y);
+		printf("       : %f, %f --- %f, %f\n", fig1.BL_model.x, fig1.BL_model.y, fig1.TR_model.x, fig1.TR_model.y);
+		printf("FIG 2  : %f, %f --- %f, %f\n", fig2.TL_model.x, fig2.TL_model.y, fig2.BR_model.x, fig2.BR_model.y);
+		printf("       : %f, %f --- %f, %f", fig2.BL_model.x, fig2.BL_model.y, fig2.TR_model.x, fig2.TR_model.y);
+	}
 	return collisionX && collisionY;
 }
 
@@ -198,4 +205,11 @@ void updateAsteroidi(int a) {
 	}
 	
 	glutTimerFunc(24, updateAsteroidi, 0);
+}
+
+void updateAngolo(int value) {
+	if (!isPaused) {
+		angolo += 1;
+	}
+	glutTimerFunc(60, updateAngolo, 0);
 }

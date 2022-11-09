@@ -17,3 +17,5 @@ void mouseClick(int x, int y);
 void update(int a);
 
 void updateAsteroidi(int a);
+
+void updateAngolo(int value);

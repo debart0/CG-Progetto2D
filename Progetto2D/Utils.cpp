@@ -117,10 +117,10 @@ vector<vec4> calcolaBoundingBox(Figura* fig) {
 
 	boundingBox.push_back(vec4(topRightCorner, 1.0));
 	boundingBox.push_back(vec4(bottomLeftCorner, 1.0));
-	printf("VECTOR\n");
+	/*printf("VECTOR\n");
 	for (vec4 vertice : boundingBox) {
 		printf("vert:\t%f, %f\n", vertice.x, vertice.y);
-	}
+	}*/
 	return boundingBox;
 }
 

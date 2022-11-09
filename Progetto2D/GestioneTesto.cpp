@@ -25,7 +25,7 @@ void Init_Freetype() {
 	FT_Face face;
 
 
-	if (FT_New_Face(ft, "fonts/arial.ttf", 0, &face))
+	if (FT_New_Face(ft, "fonts/LazenbyCompLiquid.ttf", 0, &face))
 	{
 		printf("ERROR::FREETYPE: Failed to load font\n");
 		exit(-1);

@@ -288,34 +288,30 @@ void drawScene(void)
 		player.figura.TL_model = tl;
 
 		/*NEMICI*/
+		//NEMICO 1
 		Scena[1].Model = mat4(1.0); //Inizializzo con l'identità
-		//Scena[1].Model = translate(Scena[1].Model, vec3(nemico1.posX, nemico1.posY, 0.0));
-		Scena[1].Model = translate(Scena[1].Model, vec3(250, 500, 0.0));
-
+		Scena[1].Model = translate(Scena[1].Model, vec3(nemico1.posX, nemico1.posY, 0.0));
 		Scena[1].Model = scale(Scena[1].Model, vec3(5, 5, 1.0));
-		Scena[1].Model = rotate(Scena[1].Model, radians(angolo * enemy_rotation_1), vec3(0.0, 0.0, 1.0));
 
 		br = nemico1.figura.BR_original;  tl = nemico1.figura.TL_original; 
-		bl = nemico1.figura.BL_original; tr = nemico1.figura.TR_original;
 		br = Scena[1].Model * br; tl = Scena[1].Model * tl; 
-		bl = Scena[1].Model * bl; tr = Scena[1].Model * tr;
 
+		Scena[1].Model = rotate(Scena[1].Model, radians(angolo * enemy_rotation_1), vec3(0.0, 0.0, 1.0));
 
 		nemico1.figura.BR_model = br;
 		nemico1.figura.TL_model = tl;
-		nemico1.figura.BL_model = bl;
-		nemico1.figura.TR_model = tr;
-		printf("\n\nENEMY BB : %f, %f --- %f, %f\n", nemico1.figura.TL_model.x, nemico1.figura.TL_model.y, nemico1.figura.BR_model.x, nemico1.figura.BR_model.y);
-		printf("         : %f, %f --- %f, %f\n", nemico1.figura.BL_model.x, nemico1.figura.BL_model.y, nemico1.figura.TR_model.x, nemico1.figura.TR_model.y);
-		assestaRotazioneBoundingBox(&nemico1.figura);
+
+		/*printf("\n\nENEMY BB : %f, %f --- %f, %f\n", nemico1.figura.TL_model.x, nemico1.figura.TL_model.y, nemico1.figura.BR_model.x, nemico1.figura.BR_model.y);
+		printf("         : %f, %f --- %f, %f\n", nemico1.figura.BL_model.x, nemico1.figura.BL_model.y, nemico1.figura.TR_model.x, nemico1.figura.TR_model.y);*/
+		/*assestaRotazioneBoundingBox(&nemico1.figura);
 		printf("ROTATED  : %f, %f --- %f, %f\n", nemico1.figura.TL_model.x, nemico1.figura.TL_model.y, nemico1.figura.BR_model.x, nemico1.figura.BR_model.y);
-		printf("         : %f, %f --- %f, %f", nemico1.figura.BL_model.x, nemico1.figura.BL_model.y, nemico1.figura.TR_model.x, nemico1.figura.TR_model.y);
+		printf("         : %f, %f --- %f, %f", nemico1.figura.BL_model.x, nemico1.figura.BL_model.y, nemico1.figura.TR_model.x, nemico1.figura.TR_model.y);*/
 	
 
-	
+		//NEMICO 2
 		Scena[2].Model = mat4(1.0); //Inizializzo con l'identità
 		Scena[2].Model = translate(Scena[2].Model, vec3(nemico2.posX, nemico2.posY, 0.0));
-		Scena[2].Model = scale(Scena[2].Model, vec3(7, 7, 1.0));
+		Scena[2].Model = scale(Scena[2].Model, vec3(6, 6, 1.0));
 
 		br = nemico2.figura.BR_original;  tl = nemico2.figura.TL_original;
 		br = Scena[2].Model * br; tl = Scena[2].Model * tl;
@@ -326,10 +322,7 @@ void drawScene(void)
 		nemico2.figura.TL_model = tl;
 		//assestaRotazioneBoundingBox(&nemico2.figura);
 
-		//printf("posx del nemico 2: %f\n", nemico2.posX);
-
-
-	
+		//NEMICO 3
 		Scena[3].Model = mat4(1.0); //Inizializzo con l'identità
 		Scena[3].Model = translate(Scena[3].Model, vec3(nemico3.posX, nemico3.posY, 0.0));
 		Scena[3].Model = scale(Scena[3].Model, vec3(4, 6, 1.0));
@@ -342,10 +335,6 @@ void drawScene(void)
 		nemico3.figura.BR_model = br;
 		nemico3.figura.TL_model = tl;
 		//assestaRotazioneBoundingBox(&nemico3.figura);
-
-		//printf("posx del nemico 2: %f\n", nemico2.posX);
-
-	
 
 		//Devo passare allo shader le info su dove andare a prendere le informazioni sulle variabili uniformi
 		glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(Scena[0].Model));
@@ -368,8 +357,8 @@ void drawScene(void)
 
 		
 		//Disegno Bounding Box
-		if (drawBB == TRUE)
-		{
+		//if (drawBB == TRUE)
+		//{
 			for (int j = 0; j <= 3; j++) {
 
 				/*Identity = translate(Identity, vec3(250, 500, 0.0));
@@ -381,7 +370,7 @@ void drawScene(void)
 				glDrawArrays(GL_LINE_STRIP, Scena[1].nv - 6, 6);
 				glBindVertexArray(0);
 
-			}
+			//}
 		}
 
 		if (checkCollision(player.figura, nemico1.figura) || checkCollision(player.figura, nemico2.figura)
@@ -410,15 +399,6 @@ void drawScene(void)
 	glUseProgram(programId);
 	glutSwapBuffers();
 
-}
-
-void updateAngolo(int value) {
-	if (!isPaused) {
-		angolo += 45;
-	}
-	glutTimerFunc(480, updateAngolo, 0);
-
-	glutPostRedisplay();
 }
 
 void updateCar(int a)
