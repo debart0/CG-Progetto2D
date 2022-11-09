@@ -301,6 +301,56 @@ void costruisci_fondale(vec4 col_top, vec4 col_bottom, Figura* fig)
 	fig->Model = scale(fig->Model, vec3(WINDOW_WIDTH, WINDOW_HEIGHT, 1.0));
 }
 
+void costruisci_asteroide(vec4 color_top, vec4 color_bot, Figura* forma) {
+	float* t;
+
+	//forma->CP.push_back(vec3(0.0, 0.0, 0.0));
+	forma->CP.push_back(vec3(-10, 0, 0.0));
+	forma->CP.push_back(vec3(-9.5, 3, 0.0));
+	forma->CP.push_back(vec3(-7, 6, 0.0));
+	forma->CP.push_back(vec3(-6, 9, 0.0));
+	forma->CP.push_back(vec3(-4, 10, 0.0));
+	forma->CP.push_back(vec3(-2, 9, 0.0));
+	forma->CP.push_back(vec3(0, 7, 0.0));
+	forma->CP.push_back(vec3(2, 6, 0.0));
+
+	forma->CP.push_back(vec3(5, 7, 0.0));	//Questo punto sembra problematico
+	forma->CP.push_back(vec3(9, 4, 0.0));
+	forma->CP.push_back(vec3(10, 2, 0.0));
+	forma->CP.push_back(vec3(8, -1, 0.0));
+	forma->CP.push_back(vec3(6.5, -2.5, 0.0));
+	forma->CP.push_back(vec3(7, -7, 0.0));
+	forma->CP.push_back(vec3(3, -10, 0.0));
+	forma->CP.push_back(vec3(-3, -6, 0.0));
+	forma->CP.push_back(vec3(-6, -5, 0.0));
+	forma->CP.push_back(vec3(-9, -3, 0.0));
+
+	forma->CP.push_back(vec3(-10, 0, 0.0));
+
+	t = new float[forma->CP.size()];
+	int i;
+	float step = 1.0 / (float)(forma->CP.size() - 1);
+
+	for (i = 0; i < forma->CP.size(); i++)
+		t[i] = i * step;
+
+
+	InterpolazioneHermite(t, forma, color_top, color_bot);
+	forma->vertici.push_back(vec3(-10.0, 0.0, 0.0));
+	//forma->vertici.push_back(vec3(0, 0, 0.0));
+	forma->vertici.at(0) = vec3(0.0, 0.0, 0.0);	//QUA CAMBIO IL CENTRO DELLA MESH DI HERMITE PER IL MIO SCOPO
+	forma->colors.push_back(vec4(1.0, 0.0, 0.0, 1.0));
+	forma->nv = forma->vertici.size();
+
+	vector<vec4> boundingBox = calcolaBoundingBox(forma);
+	forma->TL_original = boundingBox[0];
+	forma->BR_original = boundingBox[1];
+
+	forma->TR_original = boundingBox[2];
+	forma->BL_original = boundingBox[3];
+
+}
+
 void resettaPosizionePlayer()
 {
 	player.posX = player_default_pos.x;

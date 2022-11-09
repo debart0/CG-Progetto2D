@@ -8,8 +8,8 @@
 #define WINDOW_HEIGHT 800
 #define PLAYER_SPEED 7
 #define ENEMY_SPEED_1 4
-#define ENEMY_SPEED_2 5
-#define ENEMY_SPEED_3 3
+#define ENEMY_SPEED_2 3
+#define ENEMY_SPEED_3 5
 #define MAX_VITE 3
 
 typedef struct {
@@ -41,6 +41,9 @@ typedef struct {
 	vec4 TR_model;
 	vec4 BL_original;
 	vec4 BL_model;
+	//Cose per il fragment shader
+	int sceltaVS;
+	int sceltaFS;
 } Figura;
 
 typedef struct {

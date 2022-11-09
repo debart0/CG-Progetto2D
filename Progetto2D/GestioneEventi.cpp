@@ -129,7 +129,7 @@ bool checkCollision(Figura fig1, Figura fig2) {
 
 void update(int a) {
 	
-	if (!isPaused) {//TODO RIMETTERE COLLISIONE CON NEMICO3
+	if (!isPaused && !gameOver) {//TODO RIMETTERE COLLISIONE CON NEMICO3
 		
 		bool moving = false;
 		float width = player.figura.BR_model.x - player.figura.TL_model.x;

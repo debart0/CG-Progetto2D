@@ -13,10 +13,10 @@
 
 ////////////////////////////////////// Dichiarazione variabili //////////////////////////////////////
 
-static unsigned int programId, programId_text, MatModel, MatProj;
+static unsigned int programId, programId_text, programId_fx, MatModel, MatProj;
 unsigned int VAO_Text, VBO_Text;
 
-mat4 Projection, Identity;
+mat4 Projection;
 float angolo = 0.0, s = 1, delta_x = 0, delta_y = 0, player_dx = 0, player_dy = 0;
 float enemy_rotation_1 = 0.5, enemy_rotation_2 = -0.4, enemy_rotation_3 = 0.7;
 vec2 player_default_pos = { WINDOW_WIDTH / 2, WINDOW_HEIGHT };
@@ -35,7 +35,8 @@ bool pressing_right = false;
 vec4 asteroide_col_bot = { 0.181, 0.181, 0.185, 1.0 }, asteroide_col_top = { 0.076, 0.076, 0.084, 1.0 };
 vec4 pod_col_primario = vec4(0.80, 0.82, 0.84, 1.0), pod_col_secondario = vec4(0.09, 0.10, 0.10, 1.0), pod_col_accenti = vec4(0.91, 0.58, 0.11, 1.0);
 vec4 fondale_col_top = vec4(0.02, 0.13, 0.29, 1.0), fondale_col_bottom = vec4(0.26, 0.05, 0.29, 1.0);
-unsigned int loc_res, loc_mouse;
+vec4 colore_testo = vec4(0.82, 0.61, 0.18, 1.0), colore_testo_alt = vec4(0.80, 0.14, 0.05, 1.0);
+unsigned int locres, locmouse, loctime, lsceltavs, lsceltafs;
 vec2 mouse, res;
 
 vector<Figura> Scena;
@@ -119,55 +120,7 @@ void costruisci_cerchio(vec4 color_center, vec4 color_edges, Figura* fig) {
 
 }
 
-void costruisci_asteroide(vec4 color_top, vec4 color_bot, Figura* forma) {
-	float* t;
 
-	//forma->CP.push_back(vec3(0.0, 0.0, 0.0));
-	forma->CP.push_back(vec3(-10, 0, 0.0));
-	forma->CP.push_back(vec3(-9.5, 3, 0.0));
-	forma->CP.push_back(vec3(-7, 6, 0.0));
-	forma->CP.push_back(vec3(-6, 9, 0.0));
-	forma->CP.push_back(vec3(-4,10, 0.0));
-	forma->CP.push_back(vec3(-2, 9, 0.0));
-	forma->CP.push_back(vec3(0, 7, 0.0));
-	forma->CP.push_back(vec3(2, 6, 0.0));	
-
-	forma->CP.push_back(vec3(5,7, 0.0));	//Questo punto sembra problematico
-	forma->CP.push_back(vec3(9, 4, 0.0));
-	forma->CP.push_back(vec3(10,2, 0.0));
-	forma->CP.push_back(vec3(8, -1, 0.0));
-	forma->CP.push_back(vec3(6.5, -2.5, 0.0));
-	forma->CP.push_back(vec3(7, -7, 0.0));
-	forma->CP.push_back(vec3(3,-10, 0.0));
-	forma->CP.push_back(vec3(-3, -6, 0.0));
-	forma->CP.push_back(vec3(-6, -5, 0.0));
-	forma->CP.push_back(vec3(-9, -3, 0.0));
-
-	forma->CP.push_back(vec3(-10, 0, 0.0));
-
-	t = new float[forma->CP.size()];
-	int i;
-	float step = 1.0 / (float)(forma->CP.size() - 1);
-
-	for (i = 0; i < forma->CP.size(); i++)
-		t[i] = i * step;
-
-
-	InterpolazioneHermite(t, forma, color_top, color_bot);
-	forma->vertici.push_back(vec3(-10.0, 0.0, 0.0));
-	//forma->vertici.push_back(vec3(0, 0, 0.0));
-	forma->vertici.at(0) = vec3(0.0, 0.0, 0.0);	//QUA CAMBIO IL CENTRO DELLA MESH DI HERMITE PER IL MIO SCOPO
-	forma->colors.push_back(vec4(1.0, 0.0, 0.0, 1.0));
-	forma->nv = forma->vertici.size();
-
-	vector<vec4> boundingBox = calcolaBoundingBox(forma);
-	forma->TL_original = boundingBox[0];
-	forma->BR_original = boundingBox[1];
-
-	forma->TR_original = boundingBox[2];
-	forma->BL_original = boundingBox[3];
-
-}
 
 
 
@@ -177,7 +130,7 @@ void INIT_SHADER(void)
 
 	char* vertexShader = (char*)"vertexShader_M.glsl";
 	char* fragmentShader = (char*)"fragmentShader_M.glsl";
-	//char* fragmentShader = (char*)"fragmentShader_M_2.glsl";
+	//char* fragmentShader = (char*)"FS_mare.glsl";
 
 
 	programId = ShaderMaker::createProgram(vertexShader, fragmentShader);
@@ -188,11 +141,16 @@ void INIT_SHADER(void)
 	fragmentShader = (char*)"FragmentShader_Text.glsl";
 
 	programId_text = ShaderMaker::createProgram(vertexShader, fragmentShader);
+
+	vertexShader = (char*)"vertexShader_M.glsl";
+	fragmentShader = (char*)"FS_speciale.glsl";
+	programId_fx = ShaderMaker::createProgram(vertexShader, fragmentShader);
+
 }
 
 void INIT_VAO(void) {
-	//Cuore.nTriangles = 30;
-	//costruisci_cuore(0, 0, 1, 1, &Cuore);
+	Pod.sceltaFS = 0;
+	Pod.sceltaVS = 0;
 	costruisci_pod(pod_col_primario, pod_col_secondario, pod_col_accenti, &Pod);
 	player.figura = Pod;
 	//printf("\nPLAYER Bounding Box\t|\tTOP LEFT: %f, %f\tBOT RIGHT: %f, %f\n", player.figura.tl_original.x, player.figura.tl_original.y, player.figura.br_original.x, player.figura.br_original.y);
@@ -201,22 +159,30 @@ void INIT_VAO(void) {
 	Scena.push_back(player.figura);
 
 	//Gli asteroidi che fanno da "nemico"
+	Asteroide1.sceltaFS = 0;
+	Asteroide1.sceltaVS = 0;
 	costruisci_asteroide(asteroide_col_top, asteroide_col_bot, &Asteroide1);
 	nemico1.figura = Asteroide1;
 	crea_VAO_Vector(&Asteroide1);
 	Scena.push_back(Asteroide1);
 	//printf("\nENEMY Bounding Box\t|\tTOP LEFT: %f, %f\tBOT RIGHT: %f, %f\n", nemico1.figura.tl_original.x, nemico1.figura.tl_original.y, nemico1.figura.br_original.x, nemico1.figura.br_original.y);
 
+	Asteroide2.sceltaFS = 0;
+	Asteroide2.sceltaVS = 0;
 	costruisci_asteroide(asteroide_col_top, asteroide_col_bot, &Asteroide2);
 	nemico2.figura = Asteroide2;
 	crea_VAO_Vector(&Asteroide2);
 	Scena.push_back(Asteroide2);
 
+	Asteroide3.sceltaFS = 0;
+	Asteroide3.sceltaVS = 0;
 	costruisci_asteroide(asteroide_col_top, asteroide_col_bot, &Asteroide3);
 	nemico3.figura = Asteroide3;
 	crea_VAO_Vector(&Asteroide3);
 	Scena.push_back(Asteroide3);
 
+	Fondale.sceltaFS = 1;
+	Fondale.sceltaVS = 0;
 	costruisci_fondale(fondale_col_top, fondale_col_bottom, &Fondale);
 	crea_VAO_Vector(&Fondale);
 	Scena.push_back(Fondale);
@@ -230,9 +196,11 @@ void INIT_VAO(void) {
 	MatProj = glGetUniformLocation(programId, "Projection");
 	MatModel = glGetUniformLocation(programId, "Model");
 
-	loc_res = glGetUniformLocation(programId, "res");
-
-	loc_mouse = glGetUniformLocation(programId, "mouse");
+	lsceltavs = glGetUniformLocation(programId, "sceltaVS");
+	lsceltafs = glGetUniformLocation(programId, "sceltaFS");
+	locres = glGetUniformLocation(programId, "res");
+	loctime = glGetUniformLocation(programId, "time");
+	locmouse = glGetUniformLocation(programId, "mouse");
 }
 
 void INIT_VAO_Text(void)
@@ -251,6 +219,7 @@ void INIT_VAO_Text(void)
 	glBindVertexArray(0);
 }
 
+
 void drawScene(void)
 {
 	vite_string = "VITE: " + to_string(vite);
@@ -258,16 +227,25 @@ void drawScene(void)
 	int k;
 	res.x = (float)WINDOW_WIDTH;
 	res.y = (float)WINDOW_HEIGHT;
-	glUniform2f(loc_res, res.x, res.y);
-	glUniform2f(loc_mouse, mouse.x, mouse.y);
+	float time = glutGet(GLUT_ELAPSED_TIME) / 1000.0f;
+	
+
+	glUniform1f(loctime, time);
+	glUniform2f(locres, res.x, res.y);
+	glUniform2f(locmouse, mouse.x, mouse.y);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glUniformMatrix4fv(MatProj, 1, GL_FALSE, value_ptr(Projection)); //Questa può andare fuori dal ciclo xk nn cambia
 	
 	//FONDALE, prima disegno il fondale perché deve stare dietro alla scena
+	/*glUseProgram(programId_fx);
+	glUniformMatrix4fv(MatProj, 1, GL_FALSE, value_ptr(Projection));*/
+	glUniform1i(lsceltavs, Scena[4].sceltaVS);
+	glUniform1i(lsceltafs, Scena[4].sceltaFS);
 	glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(Scena[4].Model));
 	glBindVertexArray(Scena[4].VAO);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, Scena[4].nv);
+	//glUseProgram(programId);
 	if (!gameOver)
 	{
 		//PLAYER
@@ -337,6 +315,8 @@ void drawScene(void)
 		//assestaRotazioneBoundingBox(&nemico3.figura);
 
 		//Devo passare allo shader le info su dove andare a prendere le informazioni sulle variabili uniformi
+		glUniform1i(lsceltavs, Scena[0].sceltaVS);
+		glUniform1i(lsceltafs, Scena[0].sceltaFS);
 		glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(Scena[0].Model));
 		glBindVertexArray(Scena[0].VAO);
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -350,6 +330,8 @@ void drawScene(void)
 		//glDrawArrays(GL_TRIANGLE_FAN, Scena[0].nv - 12, 6);
 		
 		for (int k = 1; k <= 3; k++) {
+			glUniform1i(lsceltavs, Scena[k].sceltaVS);
+			glUniform1i(lsceltafs, Scena[k].sceltaFS);
 			glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(Scena[k].Model));
 			glBindVertexArray(Scena[k].VAO);
 			glDrawArrays(GL_TRIANGLE_FAN, 0, Scena[k].nv - 6);
@@ -357,20 +339,15 @@ void drawScene(void)
 
 		
 		//Disegno Bounding Box
-		//if (drawBB == TRUE)
-		//{
+		if (drawBB == TRUE)
+		{
 			for (int j = 0; j <= 3; j++) {
-
-				/*Identity = translate(Identity, vec3(250, 500, 0.0));
-				Identity = scale(Identity, vec3(5, 5, 1.0));
-				glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(Identity));*/
-
 				glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(Scena[j].Model));
 				glBindVertexArray(Scena[1].VAO);
 				glDrawArrays(GL_LINE_STRIP, Scena[1].nv - 6, 6);
 				glBindVertexArray(0);
 
-			//}
+			}
 		}
 
 		if (checkCollision(player.figura, nemico1.figura) || checkCollision(player.figura, nemico2.figura)
@@ -385,65 +362,19 @@ void drawScene(void)
 				gameOver = true;
 			}
 		}
-		RenderText(programId_text, Projection, vite_string, VAO_Text, VBO_Text, 10, WINDOW_HEIGHT - 50, 0.7f, glm::vec3(1.0, 0.0f, 0.2f));
-		RenderText(programId_text, Projection, score_string, VAO_Text, VBO_Text, 10, WINDOW_HEIGHT - 100, 0.7f, glm::vec3(1.0, 0.0f, 0.2f));
+		RenderText(programId_text, Projection, vite_string, VAO_Text, VBO_Text, 10, WINDOW_HEIGHT - 50, 0.7f, colore_testo);
+		RenderText(programId_text, Projection, score_string, VAO_Text, VBO_Text, 10, WINDOW_HEIGHT - 100, 0.7f, colore_testo);
 	}
 	
 	else {
-		printf("GAME OVER\n");
-		RenderText(programId_text, Projection, gameover_string, VAO_Text, VBO_Text, 10, WINDOW_HEIGHT - 50, 0.7f, glm::vec3(1.0, 0.0f, 0.2f));
-
+		RenderText(programId_text, Projection, gameover_string, VAO_Text, VBO_Text, 180, WINDOW_HEIGHT/2, 1.0f, colore_testo_alt);
+		RenderText(programId_text, Projection, score_string, VAO_Text, VBO_Text, 240, WINDOW_HEIGHT/2 - 50, 0.7f,colore_testo);
 	}
 	
 	
 	glUseProgram(programId);
 	glutSwapBuffers();
 
-}
-
-void updateCar(int a)
-{
-	/*if (!paused && !ded) {
-		if (asteroidMoving) {
-			vec2 angleVec = vec2(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2) - asteroid;
-			angleVec = normalize(angleVec);
-			asteroid = vec2((asteroid.x + angleVec.x * asteroidSpeed), (asteroid.y + angleVec.y * asteroidSpeed));
-			if (((asteroid.x > WINDOW_WIDTH / 2 - WINDOW_WIDTH / 10 && asteroid.x < WINDOW_WIDTH / 2) || (asteroid.x < WINDOW_WIDTH / 2 + WINDOW_WIDTH / 10 && asteroid.x > WINDOW_WIDTH / 2)) &&
-				((asteroid.y > WINDOW_HEIGHT / 2 - WINDOW_HEIGHT / 10 && asteroid.y < WINDOW_HEIGHT / 2) || (asteroid.y < WINDOW_HEIGHT / 2 + WINDOW_HEIGHT / 10 && asteroid.y > WINDOW_HEIGHT / 2))) {
-				ded = true;
-			}
-		}
-		else {
-			float newX = 0.0f, newY = 0.0f;
-			//int axisRand = linearRand(0, 3);
-			switch (axisRand) {
-				//Parte da sotto
-			case 0:
-				newY = 0;
-				newX = linearRand(0, 1280);
-				break;
-			case 1:
-				newY = 720;
-				newX = linearRand(0, 1280);
-				break;
-			case 2:
-				newX = 0;
-				newY = linearRand(0, 720);
-				break;
-			case 3:
-				newX = 1280;
-				newY = linearRand(0, 720);
-				break;
-			}
-			asteroid = vec2(newX, newY);
-			asteroidMoving = true;
-		}
-	}
-	//glutSetWindow(idfg);
-	glutPostRedisplay();
-	//glutSetWindow(idfi);
-	glutPostRedisplay();
-	//glutTimerFunc(24, update_asteroid, 0);*/
 }
 
 void main_menu_func(int option)
@@ -493,7 +424,6 @@ int main(int argc, char* argv[])
 
 	//TODO 
 	inizializzaEntity();
-	Identity = mat4(1.0);
 	glutTimerFunc(25, update, 0);
 	glutTimerFunc(25, updateAngolo, 0);
 	glutTimerFunc(60, updateAsteroidi, 0);
