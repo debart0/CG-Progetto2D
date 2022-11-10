@@ -13,7 +13,7 @@
 
 ////////////////////////////////////// Dichiarazione variabili //////////////////////////////////////
 
-static unsigned int programId, programId_text, programId_fx, MatModel, MatProj;
+static unsigned int programId, programId_text, MatModel, MatProj;
 unsigned int VAO_Text, VBO_Text;
 
 mat4 Projection;
@@ -33,7 +33,7 @@ bool isPaused = false, gameOver = false, drawBB = false;
 bool pressing_left = false;
 bool pressing_right = false;
 vec4 asteroide_col_bot = { 0.181, 0.181, 0.185, 1.0 }, asteroide_col_top = { 0.076, 0.076, 0.084, 1.0 };
-vec4 pod_col_primario = vec4(0.80, 0.82, 0.84, 1.0), pod_col_secondario = vec4(0.09, 0.10, 0.10, 1.0), pod_col_accenti = vec4(0.91, 0.58, 0.11, 1.0);
+vec4 pod_col_primario = vec4(0.80, 0.82, 0.84, 1.0), pod_col_secondario = vec4(0.09, 0.10, 0.10, 1.0), pod_col_accenti = vec4(0.91, 0.58, 0.11, 1.0), pod_col_ter = vec4(0.08, 0.31, 0.58, 1.0);
 vec4 fondale_col_top = vec4(0.02, 0.13, 0.29, 1.0), fondale_col_bottom = vec4(0.26, 0.05, 0.29, 1.0);
 vec4 colore_testo = vec4(0.82, 0.61, 0.18, 1.0), colore_testo_alt = vec4(0.80, 0.14, 0.05, 1.0);
 unsigned int locres, locmouse, loctime, lsceltavs, lsceltafs;
@@ -41,7 +41,7 @@ vec2 mouse, res;
 
 vector<Figura> Scena;
 
-Figura Pod = {}, Porta = {}, Antenna1 = {}, Antenna2 = {};
+Figura Pod = {}, Pod_alt = {};
 Figura Cuore = {}, Fondale = {};
 Figura Asteroide = {}, Asteroide1 = {}, Asteroide2 = {}, Asteroide3 = {};
 Entity player = {}, nemico1 = {}, nemico2 = {}, nemico3 = {};
@@ -121,9 +121,6 @@ void costruisci_cerchio(vec4 color_center, vec4 color_edges, Figura* fig) {
 }
 
 
-
-
-
 void INIT_SHADER(void)
 {
 	GLenum ErrorCheckValue = glGetError();
@@ -142,19 +139,19 @@ void INIT_SHADER(void)
 
 	programId_text = ShaderMaker::createProgram(vertexShader, fragmentShader);
 
-	vertexShader = (char*)"vertexShader_M.glsl";
-	fragmentShader = (char*)"FS_speciale.glsl";
-	programId_fx = ShaderMaker::createProgram(vertexShader, fragmentShader);
-
 }
 
 void INIT_VAO(void) {
 	Pod.sceltaFS = 0;
 	Pod.sceltaVS = 0;
 	costruisci_pod(pod_col_primario, pod_col_secondario, pod_col_accenti, &Pod);
-	player.figura = Pod;
+	//player.figura = Pod;//SCOMMENTARE!!
 	//printf("\nPLAYER Bounding Box\t|\tTOP LEFT: %f, %f\tBOT RIGHT: %f, %f\n", player.figura.tl_original.x, player.figura.tl_original.y, player.figura.br_original.x, player.figura.br_original.y);
 
+	Pod_alt.sceltaFS = 0;
+	Pod_alt.sceltaVS = 0;
+	costruisci_pod_alt(pod_col_primario, pod_col_secondario, pod_col_ter, pod_col_accenti, &Pod_alt);
+	player.figura = Pod_alt;
 	crea_VAO_Vector(&player.figura);
 	Scena.push_back(player.figura);
 
@@ -238,8 +235,6 @@ void drawScene(void)
 	glUniformMatrix4fv(MatProj, 1, GL_FALSE, value_ptr(Projection)); //Questa può andare fuori dal ciclo xk nn cambia
 	
 	//FONDALE, prima disegno il fondale perché deve stare dietro alla scena
-	/*glUseProgram(programId_fx);
-	glUniformMatrix4fv(MatProj, 1, GL_FALSE, value_ptr(Projection));*/
 	glUniform1i(lsceltavs, Scena[4].sceltaVS);
 	glUniform1i(lsceltafs, Scena[4].sceltaFS);
 	glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(Scena[4].Model));
@@ -320,13 +315,18 @@ void drawScene(void)
 		glUniformMatrix4fv(MatModel, 1, GL_FALSE, value_ptr(Scena[0].Model));
 		glBindVertexArray(Scena[0].VAO);
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		/*glDrawArrays(GL_TRIANGLE_FAN, 0, Scena[0].nv - 18 - 30);
-		glDrawArrays(GL_TRIANGLES, Scena[0].nv - 18 - 30,12);
-		glDrawArrays(GL_TRIANGLE_FAN, Scena[0].nv - 6 - 30, 30);*/
+
+		/*
 		glDrawArrays(GL_TRIANGLE_FAN, 0, Scena[0].nv - 24);
 		glDrawArrays(GL_TRIANGLES, Scena[0].nv - 24, 12);
 		glDrawArrays(GL_TRIANGLES, Scena[0].nv - 12, 3);
 		glDrawArrays(GL_TRIANGLES, Scena[0].nv - 9, 3);
+		*/	//POD ALT
+		glDrawArrays(GL_TRIANGLES, 0,3);
+		glDrawArrays(GL_TRIANGLES,3,3);
+		glDrawArrays(GL_TRIANGLES, 6, 12);
+		glDrawArrays(GL_TRIANGLES, 18, 6);
+		glDrawArrays(GL_TRIANGLES, 24, 6);
 		//glDrawArrays(GL_TRIANGLE_FAN, Scena[0].nv - 12, 6);
 		
 		for (int k = 1; k <= 3; k++) {

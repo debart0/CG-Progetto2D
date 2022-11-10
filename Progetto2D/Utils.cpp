@@ -279,7 +279,86 @@ void costruisci_pod(vec4 col_primario, vec4 col_secondario, vec4 col_accenti, Fi
 
 }
 
-void costruisci_antenne(vec4 col_primario, Figura* fig1, Figura* fig2) {
+void costruisci_pod_alt(vec4 col_primario, vec4 col_secondario, vec4 col_ter, vec4 col_accenti, Figura* fig) {
+	float t;
+	float stepA = (PI) / fig->nTriangles;
+	int i;
+
+	//Le due antenne (TOT VERTICI = 3 + 3)
+	fig->vertici.push_back(vec3(8.0, 6.0, 0.0));
+	fig->vertici.push_back(vec3(6.0, 5.0, 0.0));
+	fig->vertici.push_back(vec3(6.0, 3.0, 0.0));
+	fig->vertici.push_back(vec3(-8.0, 6.0, 0.0));
+	fig->vertici.push_back(vec3(-6.0, 5.0, 0.0));
+	fig->vertici.push_back(vec3(-6.0, 3.0, 0.0));
+	for (i = 1; i <= 6; i++) {
+		fig->colors.push_back(col_accenti);
+	}
+
+	//"Corpo" dell'astronave, iniziando dal trapezio superiore (TOT VERTICI = 6 + 6)
+	fig->vertici.push_back(vec3(-9.0, 0.0, 0.0));
+	fig->colors.push_back(col_primario);
+	fig->vertici.push_back(vec3(-5.0, 7.0, 0.0));
+	fig->colors.push_back(col_primario);
+	fig->vertici.push_back(vec3(5.0, 7.0, 0.0));
+	fig->colors.push_back(col_primario);
+	fig->vertici.push_back(vec3(5.0, 7.0, 0.0));
+	fig->colors.push_back(col_primario);
+	fig->vertici.push_back(vec3(9.0, 0.0, 0.0));
+	fig->colors.push_back(col_primario);
+	fig->vertici.push_back(vec3(-9.0, 0.0, 0.0));
+	fig->colors.push_back(col_primario);
+
+	fig->vertici.push_back(vec3(-10.0, -6.0, 0.0));
+	fig->colors.push_back(col_ter);
+	fig->vertici.push_back(vec3(-9.0, 0.0, 0.0));
+	fig->colors.push_back(col_primario);
+	fig->vertici.push_back(vec3(9.0, 0.0, 0.0));	
+	fig->colors.push_back(col_primario);
+	fig->vertici.push_back(vec3(9.0, 0.0, 0.0));
+	fig->colors.push_back(col_primario);
+	fig->vertici.push_back(vec3(10.0, -6.0, 0.0));
+	fig->colors.push_back(col_ter);
+	fig->vertici.push_back(vec3(-10.0, -6.0, 0.0));
+	fig->colors.push_back(col_ter);
+
+	//Porta (TOT VERTICI = 6)
+	fig->vertici.push_back(vec3(3.0, -6.0, 0.0));
+	fig->colors.push_back(col_secondario);
+	fig->vertici.push_back(vec3(3.0, -2.0, 0.0));
+	fig->colors.push_back(col_secondario);
+	fig->vertici.push_back(vec3(-3.0, -6.0, 0.0));
+	fig->colors.push_back(col_secondario);
+	fig->vertici.push_back(vec3(-3.0, -6.0, 0.0));
+	fig->colors.push_back(col_secondario);
+	fig->vertici.push_back(vec3(-3.0, -2.0, 0.0));
+	fig->colors.push_back(col_secondario);
+	fig->vertici.push_back(vec3(3.0, -2.0, 0.0));
+	fig->colors.push_back(col_secondario);
+
+	//Parte inferiore della nave (TOT VERTICI = 6)
+	fig->vertici.push_back(vec3(10.0, -6.0, 0.0));
+	fig->colors.push_back(col_secondario);
+	fig->vertici.push_back(vec3(7.0, -10.0, 0.0));
+	fig->colors.push_back(col_secondario);
+	fig->vertici.push_back(vec3(-7.0, -10.0, 0.0));
+	fig->colors.push_back(col_secondario);
+	fig->vertici.push_back(vec3(-7.0, -10.0, 0.0));
+	fig->colors.push_back(col_secondario);
+	fig->vertici.push_back(vec3(-10.0, -6.0, 0.0));
+	fig->colors.push_back(col_secondario);
+	fig->vertici.push_back(vec3(10.0, -6.0, 0.0));
+	fig->colors.push_back(col_secondario);
+
+	fig->nv = fig->vertici.size();
+
+	vector<vec4> boundingBox = calcolaBoundingBox(fig);
+	fig->TL_original = boundingBox[0];
+	fig->BR_original = boundingBox[1];
+
+	fig->TR_original = boundingBox[2];
+	fig->BL_original = boundingBox[3];
+
 
 }
 

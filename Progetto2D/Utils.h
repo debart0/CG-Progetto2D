@@ -4,7 +4,7 @@
 
 void costruisci_pod(vec4 col_primario, vec4 col_secondario, vec4 col_accenti, Figura* fig);
 
-void costruisci_antenne(vec4 col_primario, Figura* fig1, Figura* fig2);
+void costruisci_pod_alt(vec4 col_primario, vec4 col_secondario, vec4 col_ter, vec4 col_accenti, Figura* fig);
 
 void costruisci_fondale(vec4 col_top, vec4 col_bottom, Figura* fig);
 

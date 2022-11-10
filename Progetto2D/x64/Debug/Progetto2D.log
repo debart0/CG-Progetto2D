@@ -1,11 +1,4 @@
-﻿  GestioneEventi.cpp
-  Progetto2D.cpp
-D:\Users\megab\Documents\UNI\3o Anno\Computer Graphics 2\Progetti Esame\Progetto2D\Progetto2D\Progetto2D.cpp(21,54): warning C4305: 'inizializzazione': troncamento da 'double' a 'float'
-D:\Users\megab\Documents\UNI\3o Anno\Computer Graphics 2\Progetti Esame\Progetto2D\Progetto2D\Progetto2D.cpp(21,78): warning C4305: 'inizializzazione': troncamento da 'double' a 'float'
-D:\Users\megab\Documents\UNI\3o Anno\Computer Graphics 2\Progetti Esame\Progetto2D\Progetto2D\Progetto2D.cpp(104,29): warning C4305: 'inizializzazione': troncamento da 'double' a 'GLfloat'
-D:\Users\megab\Documents\UNI\3o Anno\Computer Graphics 2\Progetti Esame\Progetto2D\Progetto2D\Progetto2D.cpp(119,31): warning C4267: '=': conversione da 'size_t' a 'int'. Possibile perdita di dati.
-D:\Users\megab\Documents\UNI\3o Anno\Computer Graphics 2\Progetti Esame\Progetto2D\Progetto2D\Progetto2D.cpp(227,6): warning C4101: 'k': variabile locale senza riferimenti
-  Utils.cpp
+﻿  Utils.cpp
 D:\Users\megab\Documents\UNI\3o Anno\Computer Graphics 2\Progetti Esame\Progetto2D\Progetto2D\Utils.cpp(20,90): warning C4244: 'return': conversione da 'double' a 'float'. Possibile perdita di dati.
 D:\Users\megab\Documents\UNI\3o Anno\Computer Graphics 2\Progetti Esame\Progetto2D\Progetto2D\Utils.cpp(22,90): warning C4244: 'return': conversione da 'double' a 'float'. Possibile perdita di dati.
 D:\Users\megab\Documents\UNI\3o Anno\Computer Graphics 2\Progetti Esame\Progetto2D\Progetto2D\Utils.cpp(25,116): warning C4244: 'return': conversione da 'double' a 'float'. Possibile perdita di dati.
@@ -22,8 +15,10 @@ D:\Users\megab\Documents\UNI\3o Anno\Computer Graphics 2\Progetti Esame\Progetto
 D:\Users\megab\Documents\UNI\3o Anno\Computer Graphics 2\Progetti Esame\Progetto2D\Progetto2D\Utils.cpp(198,14): warning C4244: 'inizializzazione': conversione da 'double' a 'float'. Possibile perdita di dati.
 D:\Users\megab\Documents\UNI\3o Anno\Computer Graphics 2\Progetti Esame\Progetto2D\Progetto2D\Utils.cpp(212,13): warning C4244: 'inizializzazione': conversione da 'double' a 'float'. Possibile perdita di dati.
 D:\Users\megab\Documents\UNI\3o Anno\Computer Graphics 2\Progetti Esame\Progetto2D\Progetto2D\Utils.cpp(270,31): warning C4267: '=': conversione da 'size_t' a 'int'. Possibile perdita di dati.
-D:\Users\megab\Documents\UNI\3o Anno\Computer Graphics 2\Progetti Esame\Progetto2D\Progetto2D\Utils.cpp(296,31): warning C4267: '=': conversione da 'size_t' a 'int'. Possibile perdita di dati.
-D:\Users\megab\Documents\UNI\3o Anno\Computer Graphics 2\Progetti Esame\Progetto2D\Progetto2D\Utils.cpp(332,13): warning C4244: 'inizializzazione': conversione da 'double' a 'float'. Possibile perdita di dati.
-D:\Users\megab\Documents\UNI\3o Anno\Computer Graphics 2\Progetti Esame\Progetto2D\Progetto2D\Utils.cpp(343,35): warning C4267: '=': conversione da 'size_t' a 'int'. Possibile perdita di dati.
-  Generazione del codice in corso...
+D:\Users\megab\Documents\UNI\3o Anno\Computer Graphics 2\Progetti Esame\Progetto2D\Progetto2D\Utils.cpp(284,14): warning C4244: 'inizializzazione': conversione da 'double' a 'float'. Possibile perdita di dati.
+D:\Users\megab\Documents\UNI\3o Anno\Computer Graphics 2\Progetti Esame\Progetto2D\Progetto2D\Utils.cpp(353,31): warning C4267: '=': conversione da 'size_t' a 'int'. Possibile perdita di dati.
+D:\Users\megab\Documents\UNI\3o Anno\Computer Graphics 2\Progetti Esame\Progetto2D\Progetto2D\Utils.cpp(283,8): warning C4101: 't': variabile locale senza riferimenti
+D:\Users\megab\Documents\UNI\3o Anno\Computer Graphics 2\Progetti Esame\Progetto2D\Progetto2D\Utils.cpp(375,31): warning C4267: '=': conversione da 'size_t' a 'int'. Possibile perdita di dati.
+D:\Users\megab\Documents\UNI\3o Anno\Computer Graphics 2\Progetti Esame\Progetto2D\Progetto2D\Utils.cpp(411,13): warning C4244: 'inizializzazione': conversione da 'double' a 'float'. Possibile perdita di dati.
+D:\Users\megab\Documents\UNI\3o Anno\Computer Graphics 2\Progetti Esame\Progetto2D\Progetto2D\Utils.cpp(422,35): warning C4267: '=': conversione da 'size_t' a 'int'. Possibile perdita di dati.
   Progetto2D.vcxproj -> D:\Users\megab\Documents\UNI\3o Anno\Computer Graphics 2\Progetti Esame\Progetto2D\x64\Debug\Progetto2D.exe
