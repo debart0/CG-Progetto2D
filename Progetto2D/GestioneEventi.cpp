@@ -7,10 +7,11 @@
 extern Entity player, nemico1, nemico2, nemico3;
 extern bool isPaused, gameOver, drawBB;
 extern bool pressing_left, pressing_right, moving;
-extern int drift_orizzontale, gravity, score, vite;
-extern float angolo;
+extern int drift_orizzontale, gravity, score, vite, width, height;
+extern float angolo, w_update, h_update;
 extern vec2 mouse;
-//devo aggiungere questi movimenti alla matrice di traslazione (chiamiamo gli spostamenti dx e dy)
+extern mat4 Projection;
+
 void keyboardPressedEvent(unsigned char key, int x, int y) {
 	//x e y che passo alla funzione sono le coordinate del mouse nella finestra quindi non mi servono
 	switch (key)
@@ -90,6 +91,26 @@ void specialKeyReleasedEvent(int key, int x, int y) {
 		break;
 	}
 }
+void reshape(int w, int h) {
+	Projection = ortho(0.0f, (float)width, 0.0f, (float)height);
+
+	float AspectRatio_mondo = (float)(width) / (float)(height); //Rapporto larghezza altezza di tutto ciò che è nel mondo
+	 //Se l'aspect ratio del mondo è diversa da quella della finestra devo mappare in modo diverso 
+	 //per evitare distorsioni del disegno
+	if (AspectRatio_mondo > w / h)   //Se ridimensioniamo la larghezza della Viewport
+	{
+		glViewport(0, 0, w, w / AspectRatio_mondo);
+		w_update = (float)w;
+		h_update = w / AspectRatio_mondo;
+	}
+	else {  //Se ridimensioniamo la larghezza della viewport oppure se l'aspect ratio tra la finestra del mondo 
+			//e la finestra sullo schermo sono uguali
+		glViewport(0, 0, h * AspectRatio_mondo, h);
+		w_update = h * AspectRatio_mondo;
+		h_update = (float)h;
+	}
+
+}
 
 void mouseClick(int x, int y)
 {
@@ -147,10 +168,10 @@ void update(int a) {
 			player.posX += drift_orizzontale;
 			moving = true;
 		}
-
+		/*
 		if (!moving) {   //Se non mi sto muovendo con i tasti a e d decremento od incremento la velocita' iniziale fino a portarla
 					 // a zero e la palla continua a rimbalzare sul posto
-			/*
+			
 			if (dx > 0)
 			{
 				dx -= 1;
@@ -163,9 +184,9 @@ void update(int a) {
 				dx += 1;
 				if (dx > 0)
 					dx = 0;
-			}*/
+			}
 
-		}
+		}*/
 
 		if (player.posX <= width / 2) {
 			player.posX = width / 2	;

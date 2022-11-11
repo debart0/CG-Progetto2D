@@ -186,6 +186,8 @@ void inizializzaEntity() {
 	nemico2.posX = nemico2_default_pos.x; nemico2.posY = nemico2_default_pos.y;
 	nemico2.speed = ENEMY_SPEED_2;
 	nemico2.dx = (float) nemico2.speed;
+
+	nemico3.posX = nemico3_default_pos.x; nemico3.posY = nemico3_default_pos.y;
 	nemico3.speed = ENEMY_SPEED_3;
 	nemico3.dx = (float) nemico3.speed;
 
@@ -281,18 +283,48 @@ void costruisci_pod(vec4 col_primario, vec4 col_secondario, vec4 col_accenti, Fi
 
 void costruisci_pod_alt(vec4 col_primario, vec4 col_secondario, vec4 col_ter, vec4 col_accenti, Figura* fig) {
 	float t;
-	float stepA = (PI) / fig->nTriangles;
+	int triangles = fig->nTriangles;
+	float stepA = (PI) / triangles;
 	int i;
 
-	//Le due antenne (TOT VERTICI = 3 + 3)
-	fig->vertici.push_back(vec3(8.0, 6.0, 0.0));
+	//Le due antenne (TOT VERTICI = 9 + 9)
+	fig->vertici.push_back(vec3(7.0, 8.0, 0.0));
+	fig->vertici.push_back(vec3(9.0, 5.0, 0.0));
+	fig->vertici.push_back(vec3(7.0, 6.0, 0.0));
+	fig->vertici.push_back(vec3(9.0, 5.0, 0.0));
+	fig->vertici.push_back(vec3(7.0, 6.0, 0.0));
 	fig->vertici.push_back(vec3(6.0, 5.0, 0.0));
-	fig->vertici.push_back(vec3(6.0, 3.0, 0.0));
-	fig->vertici.push_back(vec3(-8.0, 6.0, 0.0));
+	fig->vertici.push_back(vec3(6.0, 5.0, 0.0));
+	fig->vertici.push_back(vec3(6.0, 1.0, 0.0));
+	fig->vertici.push_back(vec3(9.0, 5.0, 0.0));
+	//Antenna 2
+	fig->vertici.push_back(vec3(-7.0, 8.0, 0.0));
+	fig->vertici.push_back(vec3(-9.0, 5.0, 0.0));
+	fig->vertici.push_back(vec3(-7.0, 6.0, 0.0));
+	fig->vertici.push_back(vec3(-9.0, 5.0, 0.0));
+	fig->vertici.push_back(vec3(-7.0, 6.0, 0.0));
 	fig->vertici.push_back(vec3(-6.0, 5.0, 0.0));
-	fig->vertici.push_back(vec3(-6.0, 3.0, 0.0));
-	for (i = 1; i <= 6; i++) {
+	fig->vertici.push_back(vec3(-6.0, 5.0, 0.0));
+	fig->vertici.push_back(vec3(-6.0, 1.0, 0.0));
+	fig->vertici.push_back(vec3(-9.0, 5.0, 0.0));
+
+	for (i = 1; i <= 9*2; i++) {
 		fig->colors.push_back(col_accenti);
+	}
+
+	//Cupola dell'astronave (TOT VERTICI 1 + NTRIANGLES)
+	fig->vertici.push_back(vec3(0.0, 7.0, 0.0));	//Centro della semi-circonferenza
+
+	fig->colors.push_back(col_primario);
+
+	for (i = 0; i <= triangles; i++)
+	{
+		t = (float)i * stepA + PI;
+		fig->vertici.push_back(vec3(0.0 - 5.0 * cos(t), 7.0 - 3.0 * sin(t), 0.0));
+		//fig->vertici.push_back(vec3(radius * cos(i * twicePi / triangles), radius * sin(i * twicePi / triangles), 0.0));
+		fig->colors.push_back(col_primario);
+
+
 	}
 
 	//"Corpo" dell'astronave, iniziando dal trapezio superiore (TOT VERTICI = 6 + 6)
@@ -427,6 +459,30 @@ void costruisci_asteroide(vec4 color_top, vec4 color_bot, Figura* forma) {
 
 	forma->TR_original = boundingBox[2];
 	forma->BL_original = boundingBox[3];
+
+}
+
+void costruisci_cerchio(vec4 color_center, vec4 color_edges, Figura* fig) {
+
+	int i;
+	int triangles = fig->nTriangles;
+	int radius = fig->radius;
+	GLfloat twicePi = 2.0f * PI;
+
+
+	fig->vertici.push_back(vec3(0.0, 0.0, 0.0));
+
+	fig->colors.push_back(color_center);
+
+	for (i = 0; i <= fig->nTriangles; i++)
+	{
+		fig->vertici.push_back(vec3(radius * cos(i * twicePi / triangles), radius * sin(i * twicePi / triangles), 0.0));
+		//Colore 
+		fig->colors.push_back(color_edges);
+
+
+	}
+	fig->nv = fig->vertici.size();
 
 }
 

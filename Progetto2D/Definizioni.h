@@ -9,7 +9,7 @@
 #define PLAYER_SPEED 7
 #define ENEMY_SPEED_1 4
 #define ENEMY_SPEED_2 3
-#define ENEMY_SPEED_3 5
+#define ENEMY_SPEED_3 4
 #define MAX_VITE 3
 
 typedef struct {

@@ -10,6 +10,9 @@ void costruisci_fondale(vec4 col_top, vec4 col_bottom, Figura* fig);
 
 void costruisci_asteroide(vec4 color_top, vec4 color_bot, Figura* forma);
 
+void costruisci_cerchio(vec4 color_center, vec4 color_edges, Figura* fig);
+
+
 //Funzione per l'interpolazione delle curve di Hermite
 void InterpolazioneHermite(float* t, Figura* Fig, vec4 color_top, vec4 color_bot);
 

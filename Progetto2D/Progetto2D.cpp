@@ -21,12 +21,14 @@ float angolo = 0.0, s = 1, delta_x = 0, delta_y = 0, player_dx = 0, player_dy = 
 float enemy_rotation_1 = 0.5, enemy_rotation_2 = -0.4, enemy_rotation_3 = 0.7;
 vec2 player_default_pos = { WINDOW_WIDTH / 2, WINDOW_HEIGHT };
 vec2 nemico1_default_pos = { 100.0, WINDOW_HEIGHT / 1.5 };
-vec2 nemico2_default_pos = { 600.0 , WINDOW_HEIGHT/ 3};
-vec2 nemico3_default_pos = {27.0,  WINDOW_HEIGHT / 4.5};
+vec2 nemico2_default_pos = { 600.0 , WINDOW_HEIGHT/ 2.8};
+vec2 nemico3_default_pos = {27.0, WINDOW_HEIGHT / 15};
 
-int drift_orizzontale = 1, gravity = 2;
+int drift_orizzontale = 1, gravity = 3;
 int vite = MAX_VITE; int score = 0;
 int pval = 140;
+int width = WINDOW_WIDTH, height = WINDOW_HEIGHT;
+float w_update, h_update;
 string vite_string, score_string, gameover_string = "GAME OVER";
 bool isPaused = false, gameOver = false, drawBB = false;
 //Booleani posti a true se si usa il tasto a (spostamento a sinistra) e b (spostamento a destra)
@@ -68,58 +70,6 @@ void crea_VAO_Vector(Figura* fig)
 	glEnableVertexAttribArray(1);
 
 }
-/*void costruisci_cuore(float cx, float cy, float raggiox, float raggioy, Figura* fig) {
-
-	int i;
-	float stepA = (2 * PI) / fig->nTriangles;
-	float t;
-
-
-	fig->vertici.push_back(vec3(cx, cy, 0.0));
-
-	fig->colors.push_back(vec4(255.0 / 255.0, 75.0 / 255.0, 0.0, 1.0));
-
-	for (i = 0; i <= fig->nTriangles; i++)
-	{
-		t = (float)i * stepA;
-		fig->vertici.push_back(vec3(cx + raggiox * (16 * pow(sin(t), 3)) / 16, cy + raggioy * ((13 * cos(t) - 5 * cos(2 * t) - 2 * cos(3 * t) - cos(4 * t)) / 16), 0.0));
-		//Colore 
-		fig->colors.push_back(vec4(1.0, 204.0 / 255.0, 0.0, 1.0));
-
-
-	}
-	fig->nv = fig->vertici.size();
-
-	pair<vec4, vec4> boundingBoxPair = calcolaBoundingBox(fig);
-	fig->TL_original = boundingBoxPair.first;
-	fig->BR_original = boundingBoxPair.second;
-	//printf("Bounding Box\nTOP LEFT: %f, %f\nBOT RIGHT: %f, %f\n", topLeftCorner.x, topLeftCorner.y, bottomRightCorner.x, bottomRightCorner.y);
-}*/
-
-void costruisci_cerchio(vec4 color_center, vec4 color_edges, Figura* fig) {
-
-	int i;
-	int triangles = fig->nTriangles;
-	int radius = fig->radius;
-	GLfloat twicePi = 2.0f * PI;
-
-
-	fig->vertici.push_back(vec3(0.0, 0.0, 0.0));
-
-	fig->colors.push_back(color_center);
-
-	for (i = 0; i <= fig->nTriangles; i++)
-	{
-		fig->vertici.push_back(vec3(radius * cos(i * twicePi / triangles), radius * sin(i * twicePi / triangles), 0.0));
-		//Colore 
-		fig->colors.push_back(color_edges);
-
-
-	}
-	fig->nv = fig->vertici.size();
-
-}
-
 
 void INIT_SHADER(void)
 {
@@ -150,6 +100,7 @@ void INIT_VAO(void) {
 
 	Pod_alt.sceltaFS = 0;
 	Pod_alt.sceltaVS = 0;
+	Pod_alt.nTriangles = 50;
 	costruisci_pod_alt(pod_col_primario, pod_col_secondario, pod_col_ter, pod_col_accenti, &Pod_alt);
 	player.figura = Pod_alt;
 	crea_VAO_Vector(&player.figura);
@@ -322,11 +273,16 @@ void drawScene(void)
 		glDrawArrays(GL_TRIANGLES, Scena[0].nv - 12, 3);
 		glDrawArrays(GL_TRIANGLES, Scena[0].nv - 9, 3);
 		*/	//POD ALT
-		glDrawArrays(GL_TRIANGLES, 0,3);
-		glDrawArrays(GL_TRIANGLES,3,3);
-		glDrawArrays(GL_TRIANGLES, 6, 12);
-		glDrawArrays(GL_TRIANGLES, 18, 6);
-		glDrawArrays(GL_TRIANGLES, 24, 6);
+		glDrawArrays(GL_TRIANGLES, 0,9);
+		glDrawArrays(GL_TRIANGLES,9,9);
+		glDrawArrays(GL_TRIANGLE_FAN, 18, Scena[0].nv -30);
+
+		glDrawArrays(GL_TRIANGLES, Scena[0].nv - 30, 24);
+
+
+		//glDrawArrays(GL_TRIANGLES, 6, 12);
+		//glDrawArrays(GL_TRIANGLES, 18, 6);
+		//glDrawArrays(GL_TRIANGLES, 24, 6);
 		//glDrawArrays(GL_TRIANGLE_FAN, Scena[0].nv - 12, 6);
 		
 		for (int k = 1; k <= 3; k++) {
@@ -421,6 +377,8 @@ int main(int argc, char* argv[])
 	glutSpecialFunc(specialKeyPressedEvent);
 	glutSpecialUpFunc(specialKeyReleasedEvent);
 	glutPassiveMotionFunc(mouseClick);
+	glutReshapeFunc(reshape);
+
 
 	//TODO 
 	inizializzaEntity();

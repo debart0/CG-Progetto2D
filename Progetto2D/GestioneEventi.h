@@ -8,6 +8,8 @@ void specialKeyPressedEvent(int key, int x, int y);
 
 void specialKeyReleasedEvent(int key, int x, int y);
 
+void reshape(int w, int h);
+
 bool checkCollision(vec4 tl1, vec4 br1, vec4 tl2, vec4 br2);
 
 bool checkCollision(Figura fig1, Figura fig2);
