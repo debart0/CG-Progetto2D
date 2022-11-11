@@ -76,9 +76,7 @@ void INIT_SHADER(void)
 	GLenum ErrorCheckValue = glGetError();
 
 	char* vertexShader = (char*)"vertexShader_M.glsl";
-	char* fragmentShader = (char*)"fragmentShader_M.glsl";
-	//char* fragmentShader = (char*)"FS_mare.glsl";
-
+	char* fragmentShader = (char*)"fragmentShader_M_2.glsl";
 
 	programId = ShaderMaker::createProgram(vertexShader, fragmentShader);
 	glUseProgram(programId);
@@ -173,18 +171,17 @@ void drawScene(void)
 	vite_string = "VITE: " + to_string(vite);
 	score_string = "PUNTI: " + to_string(score);
 	int k;
-	res.x = (float)WINDOW_WIDTH;
-	res.y = (float)WINDOW_HEIGHT;
+	res.x = (float)width;
+	res.y = (float)height;
 	float time = glutGet(GLUT_ELAPSED_TIME) / 1000.0f;
-	
 
 	glUniform1f(loctime, time);
-	glUniform2f(locres, res.x, res.y);
-	glUniform2f(locmouse, mouse.x, mouse.y);
+	
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glUniformMatrix4fv(MatProj, 1, GL_FALSE, value_ptr(Projection)); //Questa può andare fuori dal ciclo xk nn cambia
-	
+	glUniform2f(locres, res.x, res.y);
+	glUniform2f(locmouse, mouse.x, mouse.y);
 	//FONDALE, prima disegno il fondale perché deve stare dietro alla scena
 	glUniform1i(lsceltavs, Scena[4].sceltaVS);
 	glUniform1i(lsceltafs, Scena[4].sceltaFS);

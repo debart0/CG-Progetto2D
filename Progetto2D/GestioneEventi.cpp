@@ -118,6 +118,7 @@ void mouseClick(int x, int y)
 	mouse.x = (float)x;
 	mouse.y = (float)y;
 
+	glutPostRedisplay();
 }
 
 bool checkCollision(vec4 tl1, vec4 br1, vec4 tl2, vec4 br2) {
