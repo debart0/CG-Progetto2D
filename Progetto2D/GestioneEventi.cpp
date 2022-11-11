@@ -8,7 +8,7 @@ extern Entity player, nemico1, nemico2, nemico3;
 extern bool isPaused, gameOver, drawBB;
 extern bool pressing_left, pressing_right, moving;
 extern int drift_orizzontale, gravity, score, vite, width, height;
-extern float angolo, w_update, h_update;
+extern float angolo, w_update, h_update, dy_asteroide;
 extern vec2 mouse;
 extern mat4 Projection;
 
@@ -212,6 +212,7 @@ void updateAsteroidi(int a) {
 		nemico1.posX += nemico1.speed;
 		nemico2.posX -= nemico2.speed;
 		nemico3.posX += nemico3.speed;
+		dy_asteroide = dy_asteroide + 0.1;
 		if (nemico1.figura.TL_model.x >= WINDOW_WIDTH) {
 			float width_nemico1 = nemico1.figura.BR_model.x - nemico1.posX;
 			nemico1.posX = -width_nemico1;

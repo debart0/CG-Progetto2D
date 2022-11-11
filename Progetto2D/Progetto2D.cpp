@@ -17,7 +17,7 @@ static unsigned int programId, programId_text, MatModel, MatProj;
 unsigned int VAO_Text, VBO_Text;
 
 mat4 Projection;
-float angolo = 0.0, s = 1, delta_x = 0, delta_y = 0, player_dx = 0, player_dy = 0;
+float angolo = 0.0, s = 1, delta_x = 0, delta_y = 0, player_dx = 0, player_dy = 0, dy_asteroide=0;
 float enemy_rotation_1 = 0.5, enemy_rotation_2 = -0.4, enemy_rotation_3 = 0.7;
 vec2 player_default_pos = { WINDOW_WIDTH / 2, WINDOW_HEIGHT };
 vec2 nemico1_default_pos = { 100.0, WINDOW_HEIGHT / 1.5 };
@@ -194,9 +194,6 @@ void drawScene(void)
 		//PLAYER
 		Scena[0].Model = mat4(1.0); //Inizializzo con l'identità
 		Scena[0].Model = translate(Scena[0].Model, vec3(player.posX, player.posY, 0.0));
-		//Scena[0].Model = translate(Scena[0].Model, vec3(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 0.0)); 
-		//Scommenta per testare la figura
-
 		Scena[0].Model = scale(Scena[0].Model, vec3(5, 5, 1.0));
 		//Scena[k].Model = rotate(Scena[0].Model, radians(angolo), vec3(0.0, 0.0, 1.0));
 		//printf("PLAYER POS : %f; %f\n", player.posX, player.posY);
@@ -211,7 +208,7 @@ void drawScene(void)
 		/*NEMICI*/
 		//NEMICO 1
 		Scena[1].Model = mat4(1.0); //Inizializzo con l'identità
-		Scena[1].Model = translate(Scena[1].Model, vec3(nemico1.posX, nemico1.posY, 0.0));
+		Scena[1].Model = translate(Scena[1].Model, vec3(nemico1.posX, nemico1.posY + 5*sin(dy_asteroide), 0.0));
 		Scena[1].Model = scale(Scena[1].Model, vec3(5, 5, 1.0));
 
 		br = nemico1.figura.BR_original;  tl = nemico1.figura.TL_original; 
@@ -231,7 +228,7 @@ void drawScene(void)
 
 		//NEMICO 2
 		Scena[2].Model = mat4(1.0); //Inizializzo con l'identità
-		Scena[2].Model = translate(Scena[2].Model, vec3(nemico2.posX, nemico2.posY, 0.0));
+		Scena[2].Model = translate(Scena[2].Model, vec3(nemico2.posX, nemico2.posY + 2 * cos(dy_asteroide), 0.0));
 		Scena[2].Model = scale(Scena[2].Model, vec3(6, 6, 1.0));
 
 		br = nemico2.figura.BR_original;  tl = nemico2.figura.TL_original;
@@ -245,7 +242,7 @@ void drawScene(void)
 
 		//NEMICO 3
 		Scena[3].Model = mat4(1.0); //Inizializzo con l'identità
-		Scena[3].Model = translate(Scena[3].Model, vec3(nemico3.posX, nemico3.posY, 0.0));
+		Scena[3].Model = translate(Scena[3].Model, vec3(nemico3.posX, nemico3.posY + 7 * cos(dy_asteroide), 0.0));
 		Scena[3].Model = scale(Scena[3].Model, vec3(4, 6, 1.0));
 
 		br = nemico3.figura.BR_original;  tl = nemico3.figura.TL_original;
