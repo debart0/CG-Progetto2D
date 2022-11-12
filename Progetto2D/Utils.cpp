@@ -118,10 +118,6 @@ vector<vec4> calcolaBoundingBox(Figura* fig) {
 
 	boundingBox.push_back(vec4(topRightCorner, 1.0));
 	boundingBox.push_back(vec4(bottomLeftCorner, 1.0));
-	/*printf("VECTOR\n");
-	for (vec4 vertice : boundingBox) {
-		printf("vert:\t%f, %f\n", vertice.x, vertice.y);
-	}*/
 	return boundingBox;
 }
 
@@ -182,20 +178,15 @@ void inizializzaEntity() {
 
 	nemico1.posX = nemico1_default_pos.x; nemico1.posY = nemico1_default_pos.y;
 	nemico1.speed = ENEMY_SPEED_1;
-	nemico1.dx = (float) nemico1.speed;
 
 	nemico2.posX = nemico2_default_pos.x; nemico2.posY = nemico2_default_pos.y;
 	nemico2.speed = ENEMY_SPEED_2;
-	nemico2.dx = (float) nemico2.speed;
 
 	nemico3.posX = nemico3_default_pos.x; nemico3.posY = nemico3_default_pos.y;
 	nemico3.speed = ENEMY_SPEED_3;
-	nemico3.dx = (float) nemico3.speed;
-
-
 }
 
-void costruisci_pod(vec4 col_primario, vec4 col_secondario, vec4 col_accenti, Figura* fig) {
+void costruisci_pod_deprecated(vec4 col_primario, vec4 col_secondario, vec4 col_accenti, Figura* fig) {
 	float* t;
 	float stepA = (PI) / fig->nTriangles;
 
@@ -281,7 +272,7 @@ void costruisci_pod(vec4 col_primario, vec4 col_secondario, vec4 col_accenti, Fi
 
 }
 
-void costruisci_pod_alt(vec4 col_primario, vec4 col_secondario, vec4 col_ter, vec4 col_accenti, Figura* fig) {
+void costruisci_pod(vec4 col_primario, vec4 col_secondario, vec4 col_ter, vec4 col_accenti, Figura* fig) {
 	float t;
 	int triangles = fig->nTriangles;
 	float stepA = (PI) / triangles;
@@ -394,15 +385,15 @@ void costruisci_pod_alt(vec4 col_primario, vec4 col_secondario, vec4 col_ter, ve
 
 }
 
-void costruisci_fondale(vec4 col_top, vec4 col_bottom, Figura* fig)
+void costruisci_fondale(vec4 col_top, vec4 col_bottom, vec4 col_mid, vec4 col_alt, Figura* fig)
 {
 	fig->vertici.push_back(vec3(0.0, 0.0, 0.0));
 	fig->vertici.push_back(vec3(1.0, 0.0, 0.0));
 	fig->vertici.push_back(vec3(0.0, 1.0, 0.0));
 	fig->vertici.push_back(vec3(1.0, 1.0, 0.0));
 	fig->colors.push_back(col_bottom);
-	fig->colors.push_back(col_top);
-	fig->colors.push_back(col_top);
+	fig->colors.push_back(col_mid);
+	fig->colors.push_back(col_alt);
 	fig->colors.push_back(col_top);
 	fig->nv = fig->vertici.size();
 

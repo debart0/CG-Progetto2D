@@ -2,11 +2,11 @@
 #include "Lib.h"
 #include "Definizioni.h"
 
-void costruisci_pod(vec4 col_primario, vec4 col_secondario, vec4 col_accenti, Figura* fig);
+void costruisci_pod_deprecated(vec4 col_primario, vec4 col_secondario, vec4 col_accenti, Figura* fig);
 
-void costruisci_pod_alt(vec4 col_primario, vec4 col_secondario, vec4 col_ter, vec4 col_accenti, Figura* fig);
+void costruisci_pod(vec4 col_primario, vec4 col_secondario, vec4 col_ter, vec4 col_accenti, Figura* fig);
 
-void costruisci_fondale(vec4 col_top, vec4 col_bottom, Figura* fig);
+void costruisci_fondale(vec4 col_top, vec4 col_bottom, vec4 col_mid, vec4 col_alt, Figura* fig);
 
 void costruisci_asteroide(vec4 color_top, vec4 color_bot, Figura* forma);
 

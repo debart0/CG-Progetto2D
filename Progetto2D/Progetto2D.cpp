@@ -36,16 +36,14 @@ bool pressing_left = false;
 bool pressing_right = false;
 vec4 asteroide_col_bot = { 0.181, 0.181, 0.185, 1.0 }, asteroide_col_top = { 0.076, 0.076, 0.084, 1.0 };
 vec4 pod_col_primario = vec4(0.80, 0.82, 0.84, 1.0), pod_col_secondario = vec4(0.09, 0.10, 0.10, 1.0), pod_col_accenti = vec4(0.91, 0.58, 0.11, 1.0), pod_col_ter = vec4(0.08, 0.31, 0.58, 1.0);
-vec4 fondale_col_top = vec4(0.02, 0.13, 0.29, 1.0), fondale_col_bottom = vec4(0.26, 0.05, 0.29, 1.0);
+vec4 fondale_col_top = vec4(0.02, 0.13, 0.29, 1.0), fondale_col_bottom = vec4(0.19, 0.03, 0.11, 1.0), fondale_col_mid = vec4(0.32, 0.15, 0.46, 1.0), fondale_col_alt = vec4(0.21, 0.16, 0.29, 1.0);
 vec4 colore_testo = vec4(0.82, 0.61, 0.18, 1.0), colore_testo_alt = vec4(0.80, 0.14, 0.05, 1.0);
 unsigned int locres, locmouse, loctime, lsceltavs, lsceltafs;
 vec2 mouse, res;
 
 vector<Figura> Scena;
 
-Figura Pod = {}, Pod_alt = {};
-Figura Cuore = {}, Fondale = {};
-Figura Asteroide = {}, Asteroide1 = {}, Asteroide2 = {}, Asteroide3 = {};
+Figura Pod = {}, Fondale = {}, Asteroide = {}, Asteroide1 = {}, Asteroide2 = {}, Asteroide3 = {};
 Entity player = {}, nemico1 = {}, nemico2 = {}, nemico3 = {};
 
 void crea_VAO_Vector(Figura* fig)
@@ -92,15 +90,9 @@ void INIT_SHADER(void)
 void INIT_VAO(void) {
 	Pod.sceltaFS = 0;
 	Pod.sceltaVS = 0;
-	costruisci_pod(pod_col_primario, pod_col_secondario, pod_col_accenti, &Pod);
-	//player.figura = Pod;//SCOMMENTARE!!
-	//printf("\nPLAYER Bounding Box\t|\tTOP LEFT: %f, %f\tBOT RIGHT: %f, %f\n", player.figura.tl_original.x, player.figura.tl_original.y, player.figura.br_original.x, player.figura.br_original.y);
-
-	Pod_alt.sceltaFS = 0;
-	Pod_alt.sceltaVS = 0;
-	Pod_alt.nTriangles = 50;
-	costruisci_pod_alt(pod_col_primario, pod_col_secondario, pod_col_ter, pod_col_accenti, &Pod_alt);
-	player.figura = Pod_alt;
+	Pod.nTriangles = 50;
+	costruisci_pod(pod_col_primario, pod_col_secondario, pod_col_ter, pod_col_accenti, &Pod);
+	player.figura = Pod;
 	crea_VAO_Vector(&player.figura);
 	Scena.push_back(player.figura);
 
@@ -111,7 +103,6 @@ void INIT_VAO(void) {
 	nemico1.figura = Asteroide1;
 	crea_VAO_Vector(&Asteroide1);
 	Scena.push_back(Asteroide1);
-	//printf("\nENEMY Bounding Box\t|\tTOP LEFT: %f, %f\tBOT RIGHT: %f, %f\n", nemico1.figura.tl_original.x, nemico1.figura.tl_original.y, nemico1.figura.br_original.x, nemico1.figura.br_original.y);
 
 	Asteroide2.sceltaFS = 0;
 	Asteroide2.sceltaVS = 0;
@@ -129,14 +120,9 @@ void INIT_VAO(void) {
 
 	Fondale.sceltaFS = 1;
 	Fondale.sceltaVS = 0;
-	costruisci_fondale(fondale_col_top, fondale_col_bottom, &Fondale);
+	costruisci_fondale(fondale_col_top, fondale_col_bottom, fondale_col_mid, fondale_col_alt, &Fondale);
 	crea_VAO_Vector(&Fondale);
 	Scena.push_back(Fondale);
-
-	//Qua metto gli "extra", ovvero dettagli in più 
-	/*costruisci_antenne(pod_col_accenti, &Antenna1, &Antenna2);
-	crea_VAO_Vector(&player.figura);
-	Scena.push_back(player.figura);*/
 
 	Projection = ortho(0.0f, float(WINDOW_WIDTH), 0.0f, float(WINDOW_HEIGHT));
 	MatProj = glGetUniformLocation(programId, "Projection");
@@ -195,8 +181,6 @@ void drawScene(void)
 		Scena[0].Model = mat4(1.0); //Inizializzo con l'identità
 		Scena[0].Model = translate(Scena[0].Model, vec3(player.posX, player.posY, 0.0));
 		Scena[0].Model = scale(Scena[0].Model, vec3(5, 5, 1.0));
-		//Scena[k].Model = rotate(Scena[0].Model, radians(angolo), vec3(0.0, 0.0, 1.0));
-		//printf("PLAYER POS : %f; %f\n", player.posX, player.posY);
 
 		vec4 br = player.figura.BR_original; vec4 tl = player.figura.TL_original;
 		vec4 bl = player.figura.BL_original; vec4 tr = player.figura.TR_original;
@@ -218,13 +202,6 @@ void drawScene(void)
 
 		nemico1.figura.BR_model = br;
 		nemico1.figura.TL_model = tl;
-
-		/*printf("\n\nENEMY BB : %f, %f --- %f, %f\n", nemico1.figura.TL_model.x, nemico1.figura.TL_model.y, nemico1.figura.BR_model.x, nemico1.figura.BR_model.y);
-		printf("         : %f, %f --- %f, %f\n", nemico1.figura.BL_model.x, nemico1.figura.BL_model.y, nemico1.figura.TR_model.x, nemico1.figura.TR_model.y);*/
-		/*assestaRotazioneBoundingBox(&nemico1.figura);
-		printf("ROTATED  : %f, %f --- %f, %f\n", nemico1.figura.TL_model.x, nemico1.figura.TL_model.y, nemico1.figura.BR_model.x, nemico1.figura.BR_model.y);
-		printf("         : %f, %f --- %f, %f", nemico1.figura.BL_model.x, nemico1.figura.BL_model.y, nemico1.figura.TR_model.x, nemico1.figura.TR_model.y);*/
-	
 
 		//NEMICO 2
 		Scena[2].Model = mat4(1.0); //Inizializzo con l'identità
@@ -261,24 +238,19 @@ void drawScene(void)
 		glBindVertexArray(Scena[0].VAO);
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-		/*
+		/* VECCHIO MODO DI COSTRUIRE IL POD
 		glDrawArrays(GL_TRIANGLE_FAN, 0, Scena[0].nv - 24);
 		glDrawArrays(GL_TRIANGLES, Scena[0].nv - 24, 12);
 		glDrawArrays(GL_TRIANGLES, Scena[0].nv - 12, 3);
-		glDrawArrays(GL_TRIANGLES, Scena[0].nv - 9, 3);
-		*/	//POD ALT
+		glDrawArrays(GL_TRIANGLES, Scena[0].nv - 9, 3);*/
+		//NUOVO MODO DI COSTRUIRE IL POD DI ATTERRAGGIO
 		glDrawArrays(GL_TRIANGLES, 0,9);
 		glDrawArrays(GL_TRIANGLES,9,9);
 		glDrawArrays(GL_TRIANGLE_FAN, 18, Scena[0].nv -30);
 
 		glDrawArrays(GL_TRIANGLES, Scena[0].nv - 30, 24);
 
-
-		//glDrawArrays(GL_TRIANGLES, 6, 12);
-		//glDrawArrays(GL_TRIANGLES, 18, 6);
-		//glDrawArrays(GL_TRIANGLES, 24, 6);
-		//glDrawArrays(GL_TRIANGLE_FAN, Scena[0].nv - 12, 6);
-		
+		//DISEGNO I 3 ASTEROIDI
 		for (int k = 1; k <= 3; k++) {
 			glUniform1i(lsceltavs, Scena[k].sceltaVS);
 			glUniform1i(lsceltafs, Scena[k].sceltaFS);
@@ -373,8 +345,6 @@ int main(int argc, char* argv[])
 	glutPassiveMotionFunc(mouseClick);
 	glutReshapeFunc(reshape);
 
-
-	//TODO 
 	inizializzaEntity();
 	glutTimerFunc(25, update, 0);
 	glutTimerFunc(25, updateAngolo, 0);
