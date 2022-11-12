@@ -228,7 +228,7 @@ void drawScene(void)
 
 		//NEMICO 2
 		Scena[2].Model = mat4(1.0); //Inizializzo con l'identità
-		Scena[2].Model = translate(Scena[2].Model, vec3(nemico2.posX, nemico2.posY + 2 * cos(dy_asteroide), 0.0));
+		Scena[2].Model = translate(Scena[2].Model, vec3(nemico2.posX, nemico2.posY + 4 * cos(dy_asteroide), 0.0));
 		Scena[2].Model = scale(Scena[2].Model, vec3(6, 6, 1.0));
 
 		br = nemico2.figura.BR_original;  tl = nemico2.figura.TL_original;
