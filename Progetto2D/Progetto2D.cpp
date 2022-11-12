@@ -17,14 +17,14 @@ static unsigned int programId, programId_text, MatModel, MatProj;
 unsigned int VAO_Text, VBO_Text;
 
 mat4 Projection;
-float angolo = 0.0, s = 1, delta_x = 0, delta_y = 0, player_dx = 0, player_dy = 0, dy_asteroide=0;
+float angolo = 0.0, s = 1, player_dx = 0, player_dy = 0, dy_asteroide=0, attrito = 0.3;
 float enemy_rotation_1 = 0.5, enemy_rotation_2 = -0.4, enemy_rotation_3 = 0.7;
 vec2 player_default_pos = { WINDOW_WIDTH / 2, WINDOW_HEIGHT };
 vec2 nemico1_default_pos = { 100.0, WINDOW_HEIGHT / 1.5 };
 vec2 nemico2_default_pos = { 600.0 , WINDOW_HEIGHT/ 2.8};
 vec2 nemico3_default_pos = {27.0, WINDOW_HEIGHT / 15};
 
-int drift_orizzontale = 1, gravity = 3;
+int drift_orizzontale = 3, gravity = 3;
 int vite = MAX_VITE; int score = 0;
 int pval = 140;
 int width = WINDOW_WIDTH, height = WINDOW_HEIGHT;

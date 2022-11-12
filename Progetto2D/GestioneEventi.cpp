@@ -8,7 +8,7 @@ extern Entity player, nemico1, nemico2, nemico3;
 extern bool isPaused, gameOver, drawBB;
 extern bool pressing_left, pressing_right, moving;
 extern int drift_orizzontale, gravity, score, vite, width, height;
-extern float angolo, w_update, h_update, dy_asteroide;
+extern float angolo, w_update, h_update, dy_asteroide, player_dx, player_dy, attrito;
 extern vec2 mouse;
 extern mat4 Projection;
 
@@ -18,15 +18,9 @@ void keyboardPressedEvent(unsigned char key, int x, int y) {
 	{
 	case 'a':
 		pressing_left = true;
-		player.posX -= player.speed;
-		/*player.figura.tl_model.x -= player.speed;
-		player.figura.br_model.x -= player.speed;*/
 		break;
 	case 'd':
 		pressing_right = true;
-		player.posX += player.speed;
-		/*player.figura.tl_model.x += player.speed;
-		player.figura.br_model.x += player.speed;*/
 		break;
 	case 'b':
 		drawBB = TRUE;
@@ -40,9 +34,6 @@ void keyboardPressedEvent(unsigned char key, int x, int y) {
 		exit(0);
 		break;
 	}
-	//printf("Speed: %d\n", player.speed);
-	//printf("PLAYER BB : %f; %f\n", player.boundingBox.topLeftCorner, player.boundingBox.bottomRightCorner);
-
 }
 
 void keyboardReleasedEvent(unsigned char key, int x, int y) {
@@ -68,11 +59,9 @@ void specialKeyPressedEvent(int key, int x, int y) {
 	{
 	case GLUT_KEY_LEFT:
 		pressing_left = true;
-		player.posX -= player.speed;
 		break;
 	case GLUT_KEY_RIGHT:
 		pressing_right = true;
-		player.posX += player.speed;
 	default:
 		break;
 	}
@@ -142,9 +131,7 @@ bool checkCollision(Figura fig1, Figura fig2) {
 	if (collisionX && collisionY) {
 		printf("\nCHECK COLLISION\n");
 		printf("FIG 1  : %f, %f --- %f, %f\n", fig1.TL_model.x, fig1.TL_model.y, fig1.BR_model.x, fig1.BR_model.y);
-		printf("       : %f, %f --- %f, %f\n", fig1.BL_model.x, fig1.BL_model.y, fig1.TR_model.x, fig1.TR_model.y);
 		printf("FIG 2  : %f, %f --- %f, %f\n", fig2.TL_model.x, fig2.TL_model.y, fig2.BR_model.x, fig2.BR_model.y);
-		printf("       : %f, %f --- %f, %f", fig2.BL_model.x, fig2.BL_model.y, fig2.TR_model.x, fig2.TR_model.y);
 	}
 	return collisionX && collisionY;
 }
@@ -152,48 +139,50 @@ bool checkCollision(Figura fig1, Figura fig2) {
 void update(int a) {
 	
 	if (!isPaused && !gameOver) {//TODO RIMETTERE COLLISIONE CON NEMICO3
-		
+
 		bool moving = false;
 		float width = player.figura.BR_model.x - player.figura.TL_model.x;
 		float height = player.figura.TL_model.y - player.figura.BR_model.y;
-		//printf("posizione player: %f\n",player.posX);
-		player.posY -= gravity;
+		player_dy = -gravity;
 		if (pressing_left){
-			//dx -= accelerazione;
-			player.posX -= drift_orizzontale;
+			player_dx = -drift_orizzontale;
 			moving = true;
 		}
 
 		if (pressing_right){
-			//dx += accelerazione;
-			player.posX += drift_orizzontale;
+			player_dx = drift_orizzontale;
 			moving = true;
 		}
-		/*
-		if (!moving) {   //Se non mi sto muovendo con i tasti a e d decremento od incremento la velocita' iniziale fino a portarla
-					 // a zero e la palla continua a rimbalzare sul posto
-			
-			if (dx > 0)
-			{
-				dx -= 1;
-				if (dx < 0)
-					dx = 0;
-			}
+		printf("Player dx %f\n", player_dx);
 
-			if (dx < 0)
+		if (!moving) {
+			if (player_dx >= attrito)
 			{
-				dx += 1;
-				if (dx > 0)
-					dx = 0;
-			}
+				player_dx -= attrito;
 
-		}*/
+				if (player_dx < attrito)
+					player_dx = attrito;
+			}
+			if (player_dx <= -attrito)
+			{
+				player_dx += attrito;
+				if (player_dx > -attrito)
+					player_dx = -attrito;
+			}
+		}
+
+		//Aggiornamento della posizione del player
+
+		player.posX += player_dx;
+		player.posY += player_dy;
 
 		if (player.posX <= width / 2) {
 			player.posX = width / 2	;
+			player_dx = 0;
 		}
 		if (player.posX > WINDOW_WIDTH - width / 2) {
 			player.posX = WINDOW_WIDTH - width / 2;
+			player_dx = 0;
 		}
 		if (player.posY < 0 - height /2) {
 			resettaPosizionePlayer();

@@ -7,6 +7,7 @@ extern Figura Asteroide1, Asteroide2, Asteroide3;
 extern Entity player, nemico1, nemico2, nemico3;
 extern vec2 player_default_pos, nemico1_default_pos, nemico2_default_pos, nemico3_default_pos;
 extern int pval;
+extern float player_dx, player_dy;
 
 /// /////////////////////////////////// Disegna geometria //////////////////////////////////////
 //Per Curve di hermite
