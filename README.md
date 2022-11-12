@@ -14,7 +14,7 @@ MOUSE: a seconda della posizione del mouse sulla finestra è possibile
 muovere le stelle sullo sfondo e influenzarne il colore. Più precisamente, andare
 a destra aumenterà la quantità di Rosso e andare in basso quella di Blu.
 
-ISTRUZIONI PER LA COMPILAZIONE:
+ISTRUZIONI PER LA COMPILAZIONE:  
 Come nelle lezioni di laboratorio, è necessario copiare i file nella cartella
 del progetto e aggiungere i .cpp ai file di origine e i .h ai file di intestazione.
 È necessario installare nupengl e glm dalla console nuget.
