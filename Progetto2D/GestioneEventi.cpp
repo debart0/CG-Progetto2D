@@ -26,11 +26,11 @@ void keyboardPressedEvent(unsigned char key, int x, int y) {
 		drawBB = TRUE;
 		break;
 	case 'p':
-		printf("\nPAUSA\n");
+		printf("\n----------------------PAUSA------------------------\n");
 		isPaused = !isPaused;
 		break;
 	case ESC:
-		printf("\nUSCITA\n");
+		printf("\n----------------------USCITA------------------------\n");
 		exit(0);
 		break;
 	}
@@ -86,11 +86,12 @@ void reshape(int w, int h) {
 	float AspectRatio_mondo = (float)(width) / (float)(height); //Rapporto larghezza altezza di tutto ciò che è nel mondo
 	 //Se l'aspect ratio del mondo è diversa da quella della finestra devo mappare in modo diverso 
 	 //per evitare distorsioni del disegno
-	if (AspectRatio_mondo > w / h)   //Se ridimensioniamo la larghezza della Viewport
+	if (AspectRatio_mondo > (float)w / (float)h)   //Se ridimensioniamo la larghezza della Viewport
 	{
 		glViewport(0, 0, w, w / AspectRatio_mondo);
 		w_update = (float)w;
 		h_update = w / AspectRatio_mondo;
+
 	}
 	else {  //Se ridimensioniamo la larghezza della viewport oppure se l'aspect ratio tra la finestra del mondo 
 			//e la finestra sullo schermo sono uguali
@@ -129,7 +130,7 @@ bool checkCollision(Figura fig1, Figura fig2) {
 		fig1.TL_model.y >= fig2.BR_model.y;
 	//Si ha collisione se c'è collisione sia nella direzione x che nella direzione y
 	if (collisionX && collisionY) {
-		printf("\nCHECK COLLISION\n");
+		printf("\n----------------------CHECK COLLISION------------------------\n");
 		printf("FIG 1  : %f, %f --- %f, %f\n", fig1.TL_model.x, fig1.TL_model.y, fig1.BR_model.x, fig1.BR_model.y);
 		printf("FIG 2  : %f, %f --- %f, %f\n", fig2.TL_model.x, fig2.TL_model.y, fig2.BR_model.x, fig2.BR_model.y);
 	}
@@ -138,23 +139,21 @@ bool checkCollision(Figura fig1, Figura fig2) {
 
 void update(int a) {
 	
-	if (!isPaused && !gameOver) {//TODO RIMETTERE COLLISIONE CON NEMICO3
-
+	if (!isPaused && !gameOver) {
 		bool moving = false;
 		float width = player.figura.BR_model.x - player.figura.TL_model.x;
 		float height = player.figura.TL_model.y - player.figura.BR_model.y;
 		player_dy = -gravity;
+		//Se sto premendo i tasti per muovermi, sposto la X di una quantità 
 		if (pressing_left){
 			player_dx = -drift_orizzontale;
 			moving = true;
 		}
-
 		if (pressing_right){
 			player_dx = drift_orizzontale;
 			moving = true;
 		}
-		printf("Player dx %f\n", player_dx);
-
+		//Se non sto premendo i tasti per muovermi, lentamente freno il movimento del giocatore.
 		if (!moving) {
 			if (player_dx >= attrito)
 			{
@@ -172,10 +171,10 @@ void update(int a) {
 		}
 
 		//Aggiornamento della posizione del player
-
 		player.posX += player_dx;
 		player.posY += player_dy;
 
+		//Controllo che il giocatore non vada "Out of bounds", ovvero fuori dai lati della finestra
 		if (player.posX <= width / 2) {
 			player.posX = width / 2	;
 			player_dx = 0;
@@ -184,11 +183,12 @@ void update(int a) {
 			player.posX = WINDOW_WIDTH - width / 2;
 			player_dx = 0;
 		}
+		//Se il giocatore esce totalmente dalla parte inferiore della finestra,
+		//allora aggiungo un punto e lo faccio ripartire
 		if (player.posY < 0 - height /2) {
 			resettaPosizionePlayer();
 			score += 1;
 			printf("Score: %d\n", score);
-		
 		}
 	}
 	glutPostRedisplay();
@@ -202,6 +202,7 @@ void updateAsteroidi(int a) {
 		nemico2.posX -= nemico2.speed;
 		nemico3.posX += nemico3.speed;
 		dy_asteroide = dy_asteroide + 0.1;
+		//Se il nemico esce da un lato della finestra, allora lo faccio apparire nel lato opposto
 		if (nemico1.figura.TL_model.x >= WINDOW_WIDTH) {
 			float width_nemico1 = nemico1.figura.BR_model.x - nemico1.posX;
 			nemico1.posX = -width_nemico1;

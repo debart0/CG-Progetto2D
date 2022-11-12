@@ -195,7 +195,6 @@ void inizializzaEntity() {
 
 }
 
-
 void costruisci_pod(vec4 col_primario, vec4 col_secondario, vec4 col_accenti, Figura* fig) {
 	float* t;
 	float stepA = (PI) / fig->nTriangles;
